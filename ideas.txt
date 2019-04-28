@@ -70,15 +70,21 @@ visible upgrades for teapup from trike to motorized, skittle bullets,
 
 - Powerup Idea: Skittles go through enemies
 - Powerup Idea: Skittle Mayhem (shoot a LOT of skittles in all directions in a short amount of time)
-- Powerup Idea: Invincibility
+- Powerup Idea: Invincibility / Shield
 - Powerup Idea: Rainbow Laser
 - Powerup Idea: Puprocks (Pop Rocks) like a grenade drop behind her
+- Powerup Idea: Black Licorice makes enemies run away
+- Powerup Idea: Lure to draw in enemies closer
+- Powerup Idea: Candy Magnet
+- Powerup Idea: Orbiting Skittle Shield
+- Powerup Idea: Extend range
 - Powerups should be in Teacups
+- Powerdown Idea: Disperse Skittles, Hard Aim
 
 - Hall-o-Wheels
 - Dystopian society where halloween has been banned. A scientist reminiscing about the past created Teapup before passing, its job bring, halloween back
 
-- Teapup is fighting against Candy-stealing robots/drones: Sweets Sniffers, Bitter Bots, Sugar Searchers, Reese's Raiders, Dum Dum Drones, P.B. Reese, No Gum Gum, Caffeine, Soylent, Colonel Mustard, Pez Pluggers, Lemon-aids, Coffee Crisp Crushers, Matcha Dog, Salmon Ella, Hash Brown, Squid Eye, BOB, 
+- Teapup is fighting against Candy-stealing robots/drones: Sweets Sniffers, Bitter Bots, Sugar Searchers, Reese's Raiders, Dum Dum Drones, P.B. Reese, No Gum Gum, Caffeine, Soylent, Colonel Mustard, Pez Pluggers, Lemon-aids, Coffee Crisp Crushers, Matcha Dog, Salmon Ella, Hash Brown, Squid Eye, BOB, Devil Cinnamon, Gum Getters
 
 How about having one person per game that can register as teapup's assistent that during the game has the ability to revive the teapup by answering a math question withing a x seconds
 
@@ -91,6 +97,20 @@ How about having one person per game that can register as teapup's assistent tha
 - Add Boss fights!
 - Teapup speech bubbles
 - and Boss speech bubbles
+
+- Enemies that have to be killed twice
+- Enemies that break into smaller enemies
+- Enemies that move faster
+- Enemies with shields on one side
+- Enemies that explode when they die
+
+- Teapup is infiltrating the Halloween Police Corporation HQ
+- Cavity Corp HQ / Tooth Fairies United / Plaque Production LTD / Corporation for A No Dessert Youth - Acronym: CANDY
+- And final boss is actually Peppermint Candy OR... a DENTIST
+- OR.. Stay Puft Marshmallow Man
+- Teapup vs. Coffeepup
+
+- When teapup dies, make her fall off the trike
 
 - Survive 60s
 - Wave 1: 3 bots at all times, every 10s = 1 extra drone

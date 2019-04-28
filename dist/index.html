@@ -18,9 +18,15 @@
       var tpHP = 1;
       var tpAngle = 0;
       var tpSpeed = 2;
-      var tpTurnSpeed = 180;
+      var tpAimAngle = 0;
+      var tpImage;
       var shieldTime = 2000;
       var shieldTimer = 2000;
+      // 3 waves per round, 3 rounds before a boss
+      var roundCount = 3;
+      var roundNumber = 0;
+      var waveCount = 3;
+      var waveNumber = 0;
       var enemyLevel = 1;
       var enemies = [];
       var hpText = null;
@@ -32,17 +38,19 @@
       var voteTimer = 0;
       var votes = {};
 
-      // TODO: Change this to actual enemy spawn logic
-      setInterval( () => {
-        if( gameState === "battle" ) {
-          spawnEnemyWave( 3 );
-        }
-      }, 10000 );
-
       function startVote() {
         gameState = "vote";
         voteTimer = voteTime;
         votes = {};
+        console.log( "Vote: !power !speed !heal" );
+        waveNumber = 0;
+        roundNumber++;
+        console.log( "ROUND:", roundNumber );
+        if( roundNumber >= roundCount ) {
+          // TODO: BOSS TIME!
+          roundNumber = 0;
+          enemyLevel++;
+        }
       }
 
       function startBattle() {
@@ -98,20 +106,50 @@
         }
       }
 
+      function aimTeapup( timeDiff ) {
+        var closestEnemy = -1, closestDist = 1000000;
+        var pX = tpTrike.position.x, pY = tpTrike.position.y;
+        enemies.forEach( (x, i) => {
+          var dX = x.position.x - pX, dY = x.position.y - pY;
+          var dist = dX * dX + dY * dY;
+          if( dist < closestDist ) {
+            closestEnemy = i;
+            closestDist = dist;
+          }
+        });
+        if( closestEnemy >= 0 ) {
+          var enemy = enemies[ closestEnemy ];
+          var dX = enemy.position.x - pX, dY = enemy.position.y - pY;
+          tpAimAngle = Math.atan2( dY, dX );
+        }
+        else {
+          // Turn towards where Teapup is moving
+          tpAimAngle = tpAngle;
+        }
+        tpImage.transform.rotation = tpAimAngle;
+      }
+
       function driveTeapup( timeDiff ) {
         var rayVals = [];
-        var numCasts = 11;
+        var numCasts = 51;
         for( var i = 0; i < numCasts; i++ ) {
           var factor = i / ( numCasts - 1 );
           var mid = ( numCasts - 1 ) / 2;
           var change = ( mid - Math.abs( i - mid ) ) / mid;
-          var dirX = Math.cos( tpAngle - Math.PI / 2 + Math.PI * factor );
-          var dirY = Math.sin( tpAngle - Math.PI / 2 + Math.PI * factor );
+          var dirX = Math.cos( tpAngle - Math.PI /2 + Math.PI * factor );
+          var dirY = Math.sin( tpAngle - Math.PI /2 + Math.PI * factor );
           var rayLength = 120 * change + 70;
           var rayCast = Unicorn.Raycast( { x: tpTrike.position.x + dirX * 60, y: tpTrike.position.y + dirY * 60 }, { x: tpTrike.position.x + dirX * rayLength, y: tpTrike.position.y + dirY * rayLength } );
-          rayVals.push( rayCast.length > 0 ? rayLength - rayCast[ 0 ].depth : rayLength );
+          if( rayCast.length > 0 ) {
+            var obstacle = rayCast.find( b => !b.body.label.startsWith( "skittle" ) );
+            if( obstacle ) {
+              console.log( obstacle );
+              rayLength = obstacle.depth;
+            }
+          }
+          rayVals.push( rayLength );
         }
-        var turnAngle = aiCompute( rayVals ) * timeDiff / 1000 * tpTurnSpeed;
+        var turnAngle = aiCompute( rayVals ) * timeDiff / 1000;
         const maxAngle = 30;
         if( turnAngle < -maxAngle ) {
           turnAngle = -maxAngle;
@@ -128,16 +166,17 @@
           tpAngle -= Math.PI * 2;
         }
         tpTrike.angle = tpAngle;
+        // console.log( tpTrike );
         Matter.Body.setVelocity( tpTrike, { x: Math.cos( tpAngle ) * tpSpeed, y: Math.sin( tpAngle ) * tpSpeed } );
       }
 
       function shootSkittle() {
-        var dirX = Math.cos( tpAngle );
-        var dirY = Math.sin( tpAngle );
+        var dirX = Math.cos( tpAimAngle );
+        var dirY = Math.sin( tpAimAngle );
         var sX = tpTrike.position.x + dirX * 60;
         var sY = tpTrike.position.y + dirY * 60;
-        var bulletX = Math.cos( tpAngle + Math.random() * -0.005 + 0.0005 );
-        var bulletY = Math.sin( tpAngle + Math.random() * -0.005 + 0.0005 );
+        var bulletX = Math.cos( tpAimAngle + Math.random() * -0.005 + 0.0005 );
+        var bulletY = Math.sin( tpAimAngle + Math.random() * -0.005 + 0.0005 );
         var skittle = Unicorn.AddObject( "skittle" + counter++, {
               type: "circle",
               x: sX, y: sY,
@@ -157,7 +196,7 @@
           type: "circle",
           x, y,
           radius: 60,
-          // sprite: "unicorn",
+          sprite: "tricycle",
           bounce: 0.9,
           onEnter: ( label, body ) => {
             if( label.startsWith( "enemy" ) ) {
@@ -178,6 +217,8 @@
             }
           }
         } );
+        tpImage = Unicorn.AddOverlay( "teapup", "teapup", x, y );
+        tpImage.anchor.set( 0.5 );
       }
 
       function spawnEnemy( x, y, health, speed ) {
@@ -224,7 +265,7 @@
           y += 360;
         }
         for( var i = 0; i < size; i++ ) {
-          spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, enemyLevel, 1 );
+          spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, enemyLevel, 2 );
         }
         // let spawner = setInterval( () => {
         //   size--;
@@ -239,6 +280,8 @@
         // Add Initialization Here
         Unicorn.Load( "heart_empty", "assets/heartEmpty.png" );
         Unicorn.Load( "heart_full", "assets/heartFull.png" );
+        Unicorn.Load( "tricycle", "assets/teapupTrike.png" );
+        Unicorn.Load( "teapup", "assets/teapup.png" );
         Unicorn.AddText( "title", "Teapup Game Prototype 2", 50, 50, {
           fontFamily: 'Bubblegum Sans',
           fontSize: 36,
@@ -285,6 +328,18 @@
         // Add Update Loop
         // console.log( timestamp, timeDiffInMs );
 
+        // Move Hearts to above Teapup
+        for( var i = 0; i < tpMaxHP; i++ ) {
+          var pX = tpTrike.position.x - 80 - 20;
+          var pY = tpTrike.position.y - 110;
+          tpEmptyHearts[ i ].position.x = pX + 40 * i;
+          tpEmptyHearts[ i ].position.y = pY;
+          tpFullHearts[ i ].position.x = pX + 40 * i;
+          tpFullHearts[ i ].position.y = pY;
+        }
+        tpImage.x = tpTrike.position.x;
+        tpImage.y = tpTrike.position.y;
+
         if( gameState === "vote" ) {
           if( voteTimer > 0 ) {
             voteTimer -= timeDiffInMs;
@@ -292,7 +347,7 @@
           if( tpHP === 1 ) {
             // Auto-Select Heal
             voteTimer = 0;
-            tpHP++;
+            tpHP += 2;
             refreshVisibleHP();
             console.log( "Auto-Heal" );
             startBattle();
@@ -312,17 +367,25 @@
             var maxVotes = Math.max( power, Math.max( speed, heal ) );
             if( power === maxVotes ) {
               console.log( "POWER UP" );
-              firingRate *= 0.75;
               firingCount++;
+              tpHP--;
+              refreshVisibleHP();
             }
             else if( speed === maxVotes ) {
               console.log( "SPEED UP" );
+              firingRate *= 0.5;
               tpSpeed++;
+              tpHP--;
+              refreshVisibleHP();
             }
             else {
               console.log( "HEAL UP" );
               if( tpHP < tpMaxHP ) {
-                tpHP++;
+                tpHP += 2;
+                if( tpHP > tpMaxHP ) {
+                  tpHP = tpMaxHP;
+                }
+                refreshVisibleHP();
               }
             }
             startBattle();
@@ -334,6 +397,18 @@
             shieldTimer -= timeDiffInMs;
           }
 
+          // Spawn enemies when the current wave is defeated
+          if( enemies.length <= 0 ) {
+            waveNumber++;
+            console.log( "WAVE:", waveNumber );
+            if( waveNumber > waveCount ) {
+              startVote();
+            }
+            else {
+              spawnEnemyWave( 1 + enemyLevel * 2 );
+            }
+          }
+
           fireTime += timeDiffInMs;
           if( fireTime > firingRate ) {
             fireTime -= firingRate;
@@ -342,17 +417,8 @@
             }
           }
 
-          // Move Hearts to above Teapup
-          for( var i = 0; i < tpMaxHP; i++ ) {
-            var pX = tpTrike.position.x - 80 - 20;
-            var pY = tpTrike.position.y - 110;
-            tpEmptyHearts[ i ].position.x = pX + 40 * i;
-            tpEmptyHearts[ i ].position.y = pY;
-            tpFullHearts[ i ].position.x = pX + 40 * i;
-            tpFullHearts[ i ].position.y = pY;
-          }
-
-          var angle = driveTeapup( timeDiffInMs);
+          driveTeapup( timeDiffInMs );
+          aimTeapup( timeDiffInMs );
 
           skittles.forEach( (x, i) => {
             x.life -= timeDiffInMs;

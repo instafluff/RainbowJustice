@@ -1,0 +1,23 @@
+COMPLETED:
+- Display Hearts/Life
+- Come up with a title
+- Game Over State
+- Waves
+- Voting (!power !speed !heal) - auto-heals when only 1 heart
+
+TODO:
+- Wave Count + Enemy Level
+- ARTS!!!
+- Scoreboard for chat
+- Boss Fights
+
+Teapup AI:
+- if safe-dist: turn and shoot
+- if close: evade and run
+- if too far: chase!
+
+
+
+
+
+Twitch Plays Geometry Wars
