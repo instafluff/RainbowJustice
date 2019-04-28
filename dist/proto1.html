@@ -1,0 +1,169 @@
+<html>
+  <head>
+    <title>Pink Fluffy Unicorn Game Engine</title>
+    <link href="https://fonts.googleapis.com/css?family=Bubblegum+Sans" rel="stylesheet">
+    <link rel='stylesheet' href='unicorn.css' />
+    <script src="pinkfluffyunicorn.min.js"></script>
+  </head>
+  <body>
+    <div id="unicorn-display"></div>
+    <script>
+      var teapupHP = 10;
+      var enemyLevel = 1;
+      var hpText = null;
+      var counter = 0;
+      var speed = 2;
+      var firingRate = 2000;
+      var firingCount = 1;
+      var fireTime = 0;
+      var skittles = [];
+      var obstacles = [];
+      setInterval( () => {
+        var body = Unicorn.AddObject( "obstacle" + counter++, {
+          type: "rectangle",
+          x: 1500, y: 680,
+          width: 100, height: 100,
+          // radius: 50,
+          // sprite: "unicorn",
+          bounce: 0,
+        } );
+        body.health = enemyLevel;
+        obstacles.push( body );
+      }, 5000 );
+
+      function Init() {
+        // Add Initialization Here
+        Unicorn.AddText( "title", "Teapup Game Prototype", 50, 50, {
+          fontFamily: 'Bubblegum Sans',
+          fontSize: 36,
+          fontWeight: 'bold',
+          fill: "#ffffff"
+        });
+        hpText = Unicorn.AddText( "health", teapupHP, 300, 500, {
+          fontFamily: 'Bubblegum Sans',
+          fontSize: 36,
+          fontWeight: 'bold',
+          fill: "#ffffff"
+        });
+        Unicorn.AddObject( "tricycle", {
+          type: "rectangle",
+          x: 300, y: 400,
+          width: 200, height: 140,
+          // sprite: "unicorn",
+          bounce: 0.9
+        } );
+        // Unicorn.AddDetector( "detect", {
+        //   type: "rectangle",
+        //   x: 64, y: 300,
+        //   width: 128, height: 128
+        // }, ( label, body ) => {
+        //   console.log( "Enter:", label, body );
+        //   Unicorn.PlaySound( "fart", {
+        //     volume: 0.25
+        //   } );
+        // }, ( label, body ) => {
+        //   console.log( "Exit:", label, body );
+        // } );
+        // Unicorn.AddParticles( "fireworks", {
+        //   shape: "circle", // "cone", "line"
+        //   // startColor: "#88ff00",
+        //   // endColor: "#ff0088",
+        //   startColor: "#FB8200",
+        //   endColor: "#FEBE79",
+        //   intensity: 10, // Scale from 1 - 10
+        //   minSpeed: 0.1,
+        //   maxSpeed: 0.25,
+        //   decay: 1, // Scale from 0 - 10
+        // }, 100, 100);
+      }
+
+      function Update( timestamp, timeDiffInMs ) {
+        // Add Update Loop
+        // console.log( timestamp, timeDiffInMs );
+
+        fireTime += timeDiffInMs;
+        if( fireTime > firingRate ) {
+          fireTime -= firingRate;
+          for( var i = 0; i < firingCount; i++ ) {
+            var skittle = Unicorn.AddObject( "skittle" + counter++, {
+              type: "circle",
+              x: 400, y: 650,
+              radius: 8,
+              // sprite: "unicorn",
+              bounce: 0,
+            } );
+            skittle.force.x = 0.01;
+            skittle.force.y = Math.random() * -0.005;
+            skittles.push( skittle );
+          }
+        }
+
+        skittles.forEach( (x, i) => {
+          if( x.position.y >= 710 ) {
+            // We've hit the ground
+            Unicorn.RemoveObject( x.label );
+            skittles.splice( i, 1 );
+          }
+          else if( obstacles.length > 0 && x.position.x >= obstacles[ 0 ].position.x - 50 - 8 ) {
+            obstacles[ 0 ].health--;
+            if( obstacles[ 0 ].health <= 0 ) {
+              // Obstacle has been destroyed!
+              Unicorn.RemoveObject( obstacles[ 0 ].label );
+              obstacles.splice( 0, 1 );
+            }
+            Unicorn.RemoveObject( x.label );
+            skittles.splice( i, 1 );
+          }
+        });
+
+        obstacles.forEach( (x, i) => {
+          if( x.position.x < 450 ) {
+            Unicorn.RemoveObject( x.label );
+            obstacles.splice( i, 1 );
+          }
+          else {
+            Matter.Body.setVelocity( x, { x: -speed, y: 0 });
+          }
+        });
+      }
+
+      function OnChatCommand( user, command, message, flags ) {
+        // Handle Chat Commands
+        if( flags.broadcaster && command == "test" ) {
+          console.log( "!test was typed in chat" );
+        }
+        if( command == "upgrade" ) {
+          if( teapupHP > 1 ) {
+            teapupHP--;
+            hpText.text = teapupHP;
+            firingRate *= 0.75;
+            firingCount++;
+            speed++;
+          }
+        }
+      }
+
+      function OnChatMessage( user, message, flags, self ) {
+        // Handle Chat Messages
+        console.log( message );
+      }
+
+      window.addEventListener('load', () => {
+        Unicorn.Create( "unicorn-display", {
+          width: 1280,
+          height: 720,
+          background: "#444444",// "transparent",
+          // background: "transparent",
+          init: Init,
+          update: Update,
+          channel: "Instafluff",
+          onCommand: OnChatCommand,
+          onChat: OnChatMessage,
+          // screenWalls: false, // Default: true
+          // wallBottom: true,
+          // gravity: { x: 0, y: 2 } // Default: { x: 0, y: 1 }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+THEME: Your Life Is Currency
+
+*Action
+*Adventure
+RPG
+Simulation
+Strategy
+Sports
+Casual
+Party
+Puzzle
+Card
+Board
+
+
+Platform games
+*Shooter games
+Fighting games
+Beat 'em up games
+*Stealth game
+Survival games
+Rhythm games
+Survival horror
+Metroidvania
+Text adventures
+Graphic adventures
+Visual novels
+Interactive movie
+
+
+
+Shooter and/or Stealth game
+"Your life is currency"
+
+
+
+SPEND LIFE AS CURRENCY
+
+Save chat members
+!shout - indicates on screen where/direction to go to find and save them (put help icon/arrow)
+timed round
+upgrade
+
+- !power, !speed, !time/shield, !fuel, !potion
+- risk life to choose 1 of 3 cards, -1/0/+1 to life
+- the card shows what upgrade it will give the streamer but not the consequence
+
+!honk
+
+side-scrolling overlay
+visible upgrades for teapup from trike to motorized, skittle bullets, 
+
+
+- Bow Wow Chow easter egg!!!
+
+!- chatters can use one of their hearts to drop power-ups/boosters/health to help teapup reach the end
+
+- everyone votes for the powerup that teapup will spend a heart to use on
+!power, !speed, !potion
+
+- if Teapup crits, she pogos over the obstacle!
+
+- Make Teapup crashes be fantastically explosive
+- and teapup comes out with just a bandaid
+
+- top upgrade could be a rainbow tank
+- each checkpoint, everyone can vote to 1. upgrade (1 heart cost), 2. gamble random (better or worse) (free)
+
+- "minigames" or spamming emotes to get upgrade points/hearts
+
+- Rainbow Laser as a power upgrade
+- Packet of Pop Rocks for ammo like a grenade
+
+- Powerup Idea: Skittles go through enemies
+- Powerup Idea: Skittle Mayhem (shoot a LOT of skittles in all directions in a short amount of time)
+- Powerup Idea: Invincibility
+- Powerup Idea: 
+
+- Hall-o-Wheels
+- Dystopian society where halloween has been banned. A scientist reminiscing about the past created Teapup before passing, its job bring, halloween back
+
+- Teapup is fighting against Candy-stealing robots/drones, Sweets Sniffers, Bitter Bots, Sugar Searchers
+
+- Teapup's Last Stand - Turn & Fire at Will (when cornered)
+
+- Add Boss fights!
+- Teapup speech bubbles
+- and Boss speech bubbles
+
+

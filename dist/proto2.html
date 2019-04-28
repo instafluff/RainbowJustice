@@ -1,0 +1,315 @@
+<html>
+  <head>
+    <title>Pink Fluffy Unicorn Game Engine</title>
+    <link href="https://fonts.googleapis.com/css?family=Bubblegum+Sans" rel="stylesheet">
+    <link rel='stylesheet' href='unicorn.css' />
+    <script src="pinkfluffyunicorn.min.js"></script>
+    <script src="brain.min.js"></script>
+  </head>
+  <body>
+    <div id="unicorn-display"></div>
+    <script>
+      var counter = 0;
+      var tpTrike = null;
+      var tpHearts = [];
+      var tpHP = 1;
+      var tpAngle = 0;
+      var tpSpeed = 2;
+      var tpTurnSpeed = 180;
+      var enemyLevel = 1;
+      var enemies = [];
+      var hpText = null;
+      var firingRate = 2000;
+      var firingCount = 1;
+      var fireTime = 0;
+      var skittles = [];
+
+      setInterval( () => {
+        spawnEnemy( getRandomInt( 1280 ), getRandomInt( 720 ), enemyLevel, 1 );
+      }, 1000 );
+
+      function aiCompute( rayVals ) {
+        var rayMax = 0;
+        var numCasts = rayVals.length;
+        for( var i = 0; i < numCasts; i++ ) {
+          var factor = i / ( numCasts - 1 );
+          var mid = ( numCasts - 1 ) / 2;
+          var change = ( mid - Math.abs( i - mid ) ) / mid;
+          rayMax += 120 * change + 70;
+        }
+        var total = 0, leftTotal = 0, rightTotal = 0;
+        for( var i = 0, len = rayVals.length / 2; i < len; i++ ) {
+          leftTotal += rayVals[ i ];
+        }
+        for( var i = Math.floor( rayVals.length / 2 ), len = rayVals.length; i < len; i++ ) {
+          rightTotal += rayVals[ i ];
+        }
+        total = rayVals.reduce( (a, b) => a + b );
+        var pikaState;
+        if( total > 0 && total < rayMax - 10 ) {
+          if( total < rayMax / 2 ) { // Too close to everything so try and turn left
+            pikaState = "left";
+          }
+          else if( leftTotal > rightTotal ) {
+            pikaState = "left";
+          }
+          else {
+            pikaState = "right";
+          }
+        }
+        else {
+          pikaState = "idle";
+        }
+        // console.log( pikaState );
+        switch( pikaState ) {
+          case "left":
+            return -90;
+          case "right":
+            return 90;
+          case "idle":
+          default:
+            return 0;
+        }
+      }
+
+      function driveTeapup( timeDiff ) {
+        var rayVals = [];
+        var numCasts = 11;
+        for( var i = 0; i < numCasts; i++ ) {
+          var factor = i / ( numCasts - 1 );
+          var mid = ( numCasts - 1 ) / 2;
+          var change = ( mid - Math.abs( i - mid ) ) / mid;
+          var dirX = Math.cos( tpAngle - Math.PI / 2 + Math.PI * factor );
+          var dirY = Math.sin( tpAngle - Math.PI / 2 + Math.PI * factor );
+          var rayLength = 120 * change + 70;
+          var rayCast = Unicorn.Raycast( { x: tpTrike.position.x + dirX * 60, y: tpTrike.position.y + dirY * 60 }, { x: tpTrike.position.x + dirX * rayLength, y: tpTrike.position.y + dirY * rayLength } );
+          rayVals.push( rayCast.length > 0 ? rayLength - rayCast[ 0 ].depth : rayLength );
+        }
+        var turnAngle = aiCompute( rayVals ) * timeDiff / 1000 * tpTurnSpeed;
+        const maxAngle = 30;
+        if( turnAngle < -maxAngle ) {
+          turnAngle = -maxAngle;
+        }
+        else if( turnAngle > maxAngle ) {
+          turnAngle = maxAngle;
+        }
+        // console.log( tpTrike.angle + " + " + turnAngle * ( 2 * Math.PI / 360 ) );
+        tpAngle += turnAngle * ( 2 * Math.PI / 360 );
+        if( tpAngle < -Math.PI * 2 ) {
+          tpAngle += Math.PI * 2;
+        }
+        if( tpAngle > Math.PI * 2 ) {
+          tpAngle -= Math.PI * 2;
+        }
+        tpTrike.angle = tpAngle;
+        Matter.Body.setVelocity( tpTrike, { x: Math.cos( tpAngle ) * tpSpeed, y: Math.sin( tpAngle ) * tpSpeed } );
+      }
+
+      function shootSkittle() {
+        var dirX = Math.cos( tpAngle );
+        var dirY = Math.sin( tpAngle );
+        var sX = tpTrike.position.x + dirX * 60;
+        var sY = tpTrike.position.y + dirY * 60;
+        var bulletX = Math.cos( tpAngle + Math.random() * -0.005 + 0.0005 );
+        var bulletY = Math.sin( tpAngle + Math.random() * -0.005 + 0.0005 );
+        var skittle = Unicorn.AddObject( "skittle" + counter++, {
+              type: "circle",
+              x: sX, y: sY,
+              radius: 8,
+              // sprite: "unicorn",
+              bounce: 0,
+            } );
+        skittle.force.x = bulletX * 0.01;
+        skittle.force.y = bulletY * 0.01;
+        skittle.life = 500;
+        skittles.push( skittle );
+      }
+
+      function spawnTeapup( x, y, health ) {
+        tpHP = health;
+        tpTrike = Unicorn.AddObject( "tricycle", {
+          type: "circle",
+          x, y,
+          radius: 60,
+          // sprite: "unicorn",
+          bounce: 0.9,
+          onEnter: ( label, body ) => {
+            if( label.startsWith( "enemy" ) ) {
+              // We hit a new enemy!
+              console.log( "ouch cheese!" );
+              tpHP--;
+              if( tpHP <= 0 ) {
+                // TODO: GAME OVER!!!
+                console.log( "GAME OVER" );
+              }
+            }
+          }
+        } );
+      }
+
+      function spawnEnemy( x, y, health, speed ) {
+        let enemy = Unicorn.AddObject( "enemy" + counter++, {
+          type: "rectangle",
+          x, y,
+          width: 50, height: 50,
+          // sprite: "unicorn",
+          bounce: 0,
+          onEnter: ( label, body ) => {
+            // Check for bullets!
+            if( label.startsWith( "skittle" ) ) {
+              // KABOOM
+              // TODO: Particles!
+              // console.log( body );
+              // Remove Skittle
+              var skittleIndex = skittles.findIndex( s => s.label === label );
+              if( skittleIndex >= 0 ) {
+                skittles.splice( skittleIndex, 1 );
+              }
+              Unicorn.RemoveObject( label );
+              enemy.health--;
+              if( enemy.health <= 0 ) {
+                // DED ENEMY
+                enemies.splice( enemies.indexOf( enemy ), 1 );
+                Unicorn.RemoveObject( enemy.label );
+              }
+            }
+          }
+        } );
+        enemy.health = health;
+        enemy.moveSpeed = speed;
+        enemies.push( enemy );
+      }
+
+      function Init() {
+        // Add Initialization Here
+        Unicorn.Load( "heart_empty", "assets/heartEmpty.png" );
+        Unicorn.Load( "empty_full", "assets/heartFull.png" );
+        Unicorn.AddText( "title", "Teapup Game Prototype 2", 50, 50, {
+          fontFamily: 'Bubblegum Sans',
+          fontSize: 36,
+          fontWeight: 'bold',
+          fill: "#000000"
+        });
+        // for( var i = 0; i < 3; i++ ) {
+        //   var Unicorn.AddOverlay( "heart_empty" + i, "heart_empty", 100, 100 );
+        //   Unicorn.AddOverlay( "heart_full" + i, "heart_full", 100, 100 );
+        //   tpHearts.push( Unicorn.AddOverlay( ))
+        // }
+        // hpText = Unicorn.AddText( "health", tpHP, 300, 500, {
+        //   fontFamily: 'Bubblegum Sans',
+        //   fontSize: 36,
+        //   fontWeight: 'bold',
+        //   fill: "#000000"
+        // });
+        spawnTeapup( 640, 360, 10 );
+        // Unicorn.AddDetector( "detect", {
+        //   type: "rectangle",
+        //   x: 64, y: 300,
+        //   width: 128, height: 128
+        // }, ( label, body ) => {
+        //   console.log( "Enter:", label, body );
+        //   Unicorn.PlaySound( "fart", {
+        //     volume: 0.25
+        //   } );
+        // }, ( label, body ) => {
+        //   console.log( "Exit:", label, body );
+        // } );
+        // Unicorn.AddParticles( "fireworks", {
+        //   shape: "circle", // "cone", "line"
+        //   // startColor: "#88ff00",
+        //   // endColor: "#ff0088",
+        //   startColor: "#FB8200",
+        //   endColor: "#FEBE79",
+        //   intensity: 10, // Scale from 1 - 10
+        //   minSpeed: 0.1,
+        //   maxSpeed: 0.25,
+        //   decay: 1, // Scale from 0 - 10
+        // }, 100, 100);
+      }
+
+      function Update( timestamp, timeDiffInMs ) {
+        // Add Update Loop
+        // console.log( timestamp, timeDiffInMs );
+
+        fireTime += timeDiffInMs;
+        if( fireTime > firingRate ) {
+          fireTime -= firingRate;
+          for( var i = 0; i < firingCount; i++ ) {
+            shootSkittle();
+          }
+        }
+
+        var angle = driveTeapup( timeDiffInMs);
+
+        skittles.forEach( (x, i) => {
+          x.life -= timeDiffInMs;
+          if( x.life <= 0 ) {
+            // We've hit the ground
+            skittles.splice( i, 1 );
+            Unicorn.RemoveObject( x.label );
+          }
+        });
+
+        // obstacles.forEach( (x, i) => {
+        //   if( x.position.x < 450 ) {
+        //     Unicorn.RemoveObject( x.label );
+        //     obstacles.splice( i, 1 );
+        //   }
+        //   else {
+        //     Matter.Body.setVelocity( x, { x: -speed, y: 0 });
+        //   }
+        // });
+        enemies.forEach( ( x, i ) => {
+          var dX = tpTrike.position.x - x.position.x;
+          var dY = tpTrike.position.y - x.position.y;
+          var length = Math.sqrt( dX * dX + dY * dY );
+          // console.log( x );
+          Matter.Body.setVelocity( x, { x: dX / length * x.moveSpeed, y: dY / length * x.moveSpeed });
+        });
+      }
+
+      function OnChatCommand( user, command, message, flags ) {
+        // Handle Chat Commands
+        if( flags.broadcaster && command == "test" ) {
+          console.log( "!test was typed in chat" );
+        }
+        if( command === "pupgrade" ) {
+          if( tpHP > 1 ) {
+            tpHP--;
+            // hpText.text = tpHP;
+            firingRate *= 0.75;
+            firingCount++;
+            tpSpeed++;
+          }
+        }
+      }
+
+      function OnChatMessage( user, message, flags, self ) {
+        // Handle Chat Messages
+        console.log( message );
+      }
+
+      function getRandomInt( max ) {
+        return Math.floor( Math.random() * Math.floor( max ) );
+      }
+
+      window.addEventListener('load', () => {
+        Unicorn.Create( "unicorn-display", {
+          width: 1280,
+          height: 720,
+          background: 0xaaaaaa,// "transparent",
+          // background: "transparent",
+          init: Init,
+          update: Update,
+          channel: "Instafluff",
+          onCommand: OnChatCommand,
+          onChat: OnChatMessage,
+          // screenWalls: false, // Default: true
+          // wallBottom: true,
+          gravity: { x: 0, y: 0 },
+          // gravity: { x: 0, y: 2 } // Default: { x: 0, y: 1 }
+        });
+      });
+    </script>
+  </body>
+</html>
