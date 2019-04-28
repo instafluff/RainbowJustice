@@ -68,23 +68,32 @@ visible upgrades for teapup from trike to motorized, skittle bullets,
 
 - "minigames" or spamming emotes to get upgrade points/hearts
 
-- Rainbow Laser as a power upgrade
-- Packet of Pop Rocks for ammo like a grenade
-
 - Powerup Idea: Skittles go through enemies
 - Powerup Idea: Skittle Mayhem (shoot a LOT of skittles in all directions in a short amount of time)
 - Powerup Idea: Invincibility
-- Powerup Idea: 
+- Powerup Idea: Rainbow Laser
+- Powerup Idea: Puprocks (Pop Rocks) like a grenade drop behind her
+- Powerups should be in Teacups
 
 - Hall-o-Wheels
 - Dystopian society where halloween has been banned. A scientist reminiscing about the past created Teapup before passing, its job bring, halloween back
 
-- Teapup is fighting against Candy-stealing robots/drones, Sweets Sniffers, Bitter Bots, Sugar Searchers
+- Teapup is fighting against Candy-stealing robots/drones: Sweets Sniffers, Bitter Bots, Sugar Searchers, Reese's Raiders, Dum Dum Drones, P.B. Reese, No Gum Gum, Caffeine, Soylent, Colonel Mustard, Pez Pluggers, Lemon-aids, Coffee Crisp Crushers, Matcha Dog, Salmon Ella, Hash Brown, Squid Eye, BOB, 
+
+How about having one person per game that can register as teapup's assistent that during the game has the ability to revive the teapup by answering a math question withing a x seconds
+
+- When channel gets raided, drones get reinforcements. Or Teapup gets a heart back, like stamina, or when wrestlers "fight out" of the sleeper hold by holding their arm up
+
+- When someone cheers, the next enemy Teapup beats she says "That was for (cheerer's name)"
 
 - Teapup's Last Stand - Turn & Fire at Will (when cornered)
 
 - Add Boss fights!
 - Teapup speech bubbles
 - and Boss speech bubbles
+
+- Survive 60s
+- Wave 1: 3 bots at all times, every 10s = 1 extra drone
+
 
 

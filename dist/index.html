@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title>Pink Fluffy Unicorn Game Engine</title>
+    <title>Rainbow Rampage</title>
     <link href="https://fonts.googleapis.com/css?family=Bubblegum+Sans" rel="stylesheet">
     <link rel='stylesheet' href='unicorn.css' />
     <script src="pinkfluffyunicorn.min.js"></script>
@@ -9,10 +9,12 @@
   <body>
     <div id="unicorn-display"></div>
     <script>
+      var gameState = "vote"; // vote, battle, end
       var counter = 0;
       var tpTrike = null;
       var tpEmptyHearts = [];
       var tpFullHearts = [];
+      const tpMaxHP = 5;
       var tpHP = 1;
       var tpAngle = 0;
       var tpSpeed = 2;
@@ -26,10 +28,31 @@
       var firingCount = 1;
       var fireTime = 0;
       var skittles = [];
+      var voteTime = 1000; // 60000
+      var voteTimer = 0;
+      var votes = {};
 
+      // TODO: Change this to actual enemy spawn logic
       setInterval( () => {
-        spawnEnemy( getRandomInt( 1280 ), getRandomInt( 720 ), enemyLevel, 1 );
-      }, 1000 );
+        if( gameState === "battle" ) {
+          spawnEnemyWave( 3 );
+        }
+      }, 10000 );
+
+      function startVote() {
+        gameState = "vote";
+        voteTimer = voteTime;
+        votes = {};
+      }
+
+      function startBattle() {
+        gameState = "battle";
+      }
+
+      function endGame() {
+        gameState = "end";
+        tpTrike.isStatic = true;
+      }
 
       function aiCompute( rayVals ) {
         var rayMax = 0;
@@ -139,12 +162,14 @@
           onEnter: ( label, body ) => {
             if( label.startsWith( "enemy" ) ) {
               // We hit a new enemy!
-              console.log( "ouch cheese!" );
               if( shieldTimer <= 0 ) {
+                console.log( "ouch cheese!" );
                 tpHP--;
+                refreshVisibleHP();
                 if( tpHP <= 0 ) {
-                  // TODO: GAME OVER!!!
+                  // GAME OVER!!!
                   console.log( "GAME OVER" );
+                  endGame();
                 }
                 else {
                   shieldTimer = shieldTime;
@@ -188,6 +213,28 @@
         enemies.push( enemy );
       }
 
+      function spawnEnemyWave( size ) {
+        // TODO: Add multiple types of enemies
+        // Select a warp spot away from Teapup
+        var x = getRandomInt( 640 ), y = getRandomInt( 360 );
+        if( tpTrike.position.x < 640 ) {
+          x += 640;
+        }
+        if( tpTrike.position.y < 360 ) {
+          y += 360;
+        }
+        for( var i = 0; i < size; i++ ) {
+          spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, enemyLevel, 1 );
+        }
+        // let spawner = setInterval( () => {
+        //   size--;
+        //   if( size <= 0 ) {
+        //     clearInterval( spawner );
+        //   }
+          
+        // }, 500 );
+      }
+
       function Init() {
         // Add Initialization Here
         Unicorn.Load( "heart_empty", "assets/heartEmpty.png" );
@@ -198,7 +245,7 @@
           fontWeight: 'bold',
           fill: "#000000"
         });
-        for( var i = 0; i < 3; i++ ) {
+        for( var i = 0; i < tpMaxHP; i++ ) {
           tpEmptyHearts.push( Unicorn.AddOverlay( "heart_empty" + i, "heart_empty", 100, 100 ) );
           tpFullHearts.push( Unicorn.AddOverlay( "heart_full" + i, "heart_full", 100, 100 ) );
         }
@@ -208,7 +255,7 @@
         //   fontWeight: 'bold',
         //   fill: "#000000"
         // });
-        spawnTeapup( 640, 360, 10 );
+        spawnTeapup( 640, 360, tpMaxHP );
         // Unicorn.AddDetector( "detect", {
         //   type: "rectangle",
         //   x: 64, y: 300,
@@ -238,67 +285,119 @@
         // Add Update Loop
         // console.log( timestamp, timeDiffInMs );
 
-        if( shieldTimer > 0 ) {
-          shieldTimer -= timeDiffInMs;
-        }
-
-        fireTime += timeDiffInMs;
-        if( fireTime > firingRate ) {
-          fireTime -= firingRate;
-          for( var i = 0; i < firingCount; i++ ) {
-            shootSkittle();
+        if( gameState === "vote" ) {
+          if( voteTimer > 0 ) {
+            voteTimer -= timeDiffInMs;
+          }
+          if( tpHP === 1 ) {
+            // Auto-Select Heal
+            voteTimer = 0;
+            tpHP++;
+            refreshVisibleHP();
+            console.log( "Auto-Heal" );
+            startBattle();
+          }
+          else if( voteTimer <= 0 ) {
+            var power = Math.random() * 0.1, speed = Math.random() * 0.1, heal = Math.random() * 0.1;
+            Object.keys( votes ).forEach( v => {
+              switch( votes[ v ] ) {
+                case "power": power++; break;
+                case "speed": speed++; break;
+                case "heal": heal++; break;
+              }
+            } );
+            console.log( "Power:", power );
+            console.log( "Speed:", speed );
+            console.log( "Heal:", heal );
+            var maxVotes = Math.max( power, Math.max( speed, heal ) );
+            if( power === maxVotes ) {
+              console.log( "POWER UP" );
+              firingRate *= 0.75;
+              firingCount++;
+            }
+            else if( speed === maxVotes ) {
+              console.log( "SPEED UP" );
+              tpSpeed++;
+            }
+            else {
+              console.log( "HEAL UP" );
+              if( tpHP < tpMaxHP ) {
+                tpHP++;
+              }
+            }
+            startBattle();
           }
         }
 
-        // Move Hearts to above Teapup
-        for( var i = 0; i < 3; i++ ) {
-          var pX = tpTrike.position.x - 40 - 20;
-          var pY = tpTrike.position.y - 100;
-          tpEmptyHearts[ i ].position.x = pX + 40 * i;
-          tpEmptyHearts[ i ].position.y = pY;
-          tpFullHearts[ i ].position.x = pX + 40 * i;
-          tpFullHearts[ i ].position.y = pY;
+        if( gameState === "battle" ) {
+          if( shieldTimer > 0 ) {
+            shieldTimer -= timeDiffInMs;
+          }
+
+          fireTime += timeDiffInMs;
+          if( fireTime > firingRate ) {
+            fireTime -= firingRate;
+            for( var i = 0; i < firingCount; i++ ) {
+              shootSkittle();
+            }
+          }
+
+          // Move Hearts to above Teapup
+          for( var i = 0; i < tpMaxHP; i++ ) {
+            var pX = tpTrike.position.x - 80 - 20;
+            var pY = tpTrike.position.y - 110;
+            tpEmptyHearts[ i ].position.x = pX + 40 * i;
+            tpEmptyHearts[ i ].position.y = pY;
+            tpFullHearts[ i ].position.x = pX + 40 * i;
+            tpFullHearts[ i ].position.y = pY;
+          }
+
+          var angle = driveTeapup( timeDiffInMs);
+
+          skittles.forEach( (x, i) => {
+            x.life -= timeDiffInMs;
+            if( x.life <= 0 ) {
+              // We've hit the ground
+              skittles.splice( i, 1 );
+              Unicorn.RemoveObject( x.label );
+            }
+          });
+
+          enemies.forEach( ( x, i ) => {
+            var dX = tpTrike.position.x - x.position.x;
+            var dY = tpTrike.position.y - x.position.y;
+            var length = Math.sqrt( dX * dX + dY * dY );
+            // console.log( x );
+            Matter.Body.setVelocity( x, { x: dX / length * x.moveSpeed, y: dY / length * x.moveSpeed });
+          });
+        }
+      }
+
+      function refreshVisibleHP() {
+        for( var i = 0; i < tpFullHearts.length; i++ ) {
           // Only show upto the amount of life Teapup has
           tpFullHearts[ i ].visible = i < tpHP;
         }
-
-        var angle = driveTeapup( timeDiffInMs);
-
-        skittles.forEach( (x, i) => {
-          x.life -= timeDiffInMs;
-          if( x.life <= 0 ) {
-            // We've hit the ground
-            skittles.splice( i, 1 );
-            Unicorn.RemoveObject( x.label );
-          }
-        });
-
-        // obstacles.forEach( (x, i) => {
-        //   if( x.position.x < 450 ) {
-        //     Unicorn.RemoveObject( x.label );
-        //     obstacles.splice( i, 1 );
-        //   }
-        //   else {
-        //     Matter.Body.setVelocity( x, { x: -speed, y: 0 });
-        //   }
-        // });
-        enemies.forEach( ( x, i ) => {
-          var dX = tpTrike.position.x - x.position.x;
-          var dY = tpTrike.position.y - x.position.y;
-          var length = Math.sqrt( dX * dX + dY * dY );
-          // console.log( x );
-          Matter.Body.setVelocity( x, { x: dX / length * x.moveSpeed, y: dY / length * x.moveSpeed });
-        });
       }
 
       function OnChatCommand( user, command, message, flags ) {
         // Handle Chat Commands
-        if( flags.broadcaster && command == "test" ) {
-          console.log( "!test was typed in chat" );
+        if( gameState === "vote" ) {
+          switch( command ) {
+            case "power":
+            case "speed":
+            case "heal":
+              // Add to tally
+              console.log( user + " voted " + command );
+              votes[ user ] = command;
+              break;
+          }
         }
+
         if( command === "pupgrade" ) {
           if( tpHP > 1 ) {
             tpHP--;
+            refreshVisibleHP();
             // hpText.text = tpHP;
             firingRate *= 0.75;
             firingCount++;
@@ -332,6 +431,8 @@
           gravity: { x: 0, y: 0 },
           // gravity: { x: 0, y: 2 } // Default: { x: 0, y: 1 }
         });
+        // TODO: Start game via chat command
+        startVote();
       });
     </script>
   </body>
