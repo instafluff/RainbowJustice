@@ -42,7 +42,15 @@
         "Enjoy my cavity canon!",
         "Do I still seem sweet to you, pupper?",
         "Someone call Dr. Bazooka Joe",
-        "Trick or Treat!"
+        "Trick or Treat!",
+        "I'M THE SWEETEST!",
+        "SUGAR ME TIMBERS!"
+      ];
+      var teapupIntro = [
+        "so this is Sugar-Free HQ...",
+        "they can't ban Halloween forever.",
+        "NOT IF I CAN HELP IT",
+        "!candytime to Begin!"
       ];
       var teapupGameOver = [
         "ouch",
@@ -54,7 +62,9 @@
         "AHHHHHHHHHHHHHHHHH"
       ];
 
-      var gameState = "vote"; // start, vote, battle, end
+      var gameState = "start"; // start, vote, battle, end
+      var introText = -1;
+      var introTextTimer = 1000;
       var counter = 0;
       var tpTrike = null;
       var tpExhaust = [];
@@ -161,6 +171,10 @@
         setTimeout( () => {
           showSpeechBubble( teapupGameOver[ getRandomInt( teapupGameOver.length ) ] );
         }, tpDeathTimer );
+        
+        setTimeout( () => {
+          location.reload();
+        }, 20000 );
       }
 
       function aiCompute( rayVals ) {
@@ -651,15 +665,10 @@
         // }, ( label, body ) => {
         //   console.log( "Exit:", label, body );
         // } );
-
-        // TODO: Start game via chat command
-        startVote();
       }
 
       function Update( timestamp, timeDiffInMs ) {
         // Add Update Loop
-        // console.log( timestamp, timeDiffInMs );
-
         if( tpHP > 0 ) {
           tpImage.x = tpTrike.position.x;
           tpImage.y = tpTrike.position.y;
@@ -694,6 +703,23 @@
         }
 
         voteText.visible = false;
+
+        if( gameState === "start" ) {
+          if( introTextTimer > 0 ) {
+            introTextTimer -= timeDiffInMs;
+            if( introTextTimer <= 0 ) {
+              introText++;
+              if( introText >= teapupIntro.length ) {
+                introText = teapupIntro.length - 1;
+              }
+              showSpeechBubble( teapupIntro[ introText ] );
+              introTextTimer = 5000;
+            }
+          }
+
+          driveTeapup( timeDiffInMs );
+          aimTeapup( timeDiffInMs );
+        }
 
         if( gameState === "vote" ) {
           if( voteTimer > 0 ) {
@@ -961,7 +987,14 @@
 
       function OnChatCommand( user, command, message, flags ) {
         // Handle Chat Commands
-        if( gameState === "vote" ) {
+        if( gameState === "start" ) {
+          switch( command ) {
+            case "candytime":
+              startVote();
+              break;
+          }
+        }
+        else if( gameState === "vote" ) {
           switch( command ) {
             case "power":
             case "speed":
@@ -969,6 +1002,12 @@
               // Add to tally
               console.log( user + " voted " + command );
               votes[ user ] = command;
+              break;
+            case "gogogo":
+            case "next":
+              if( flags.broadcaster || flags.mod ) {
+                voteTimer = 100;
+              }
               break;
           }
         }
