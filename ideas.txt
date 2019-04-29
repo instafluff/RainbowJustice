@@ -96,6 +96,8 @@ How about having one person per game that can register as teapup's assistent tha
 
 - Teapup's Last Stand - Turn & Fire at Will (when cornered)
 
+Captain of Catastrophy as One last Pup to throw in the lava... but this isnt just any pup , Its TeePup , The 3 wheeler Savior
+
 - Add Boss fights!
 - Teapup speech bubbles
 - and Boss speech bubbles
@@ -116,6 +118,8 @@ How about having one person per game that can register as teapup's assistent tha
 
 - Survive 60s
 - Wave 1: 3 bots at all times, every 10s = 1 extra drone
+
+
 
 
 

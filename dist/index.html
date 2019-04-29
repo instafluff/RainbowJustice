@@ -38,6 +38,11 @@
         "This one is for Prof. Fluffington!",
         // "I'll be back!",
         "Winner Winner Skittles Dinner",
+        "Taste this rainbow cannon's fury!",
+        "Eat colors and weep!",
+        "Enjoy my cavity canon!",
+        "Do I still seem sweet to you, pupper?",
+        "Someone call Dr. Bazooka Joe"
       ];
 
       var gameState = "vote"; // vote, battle, end
@@ -74,6 +79,12 @@
       var waveNumber = 0;
       var enemyLevel = 1;
       var enemies = [];
+      var bosscat = [];
+      var bossTimer = 0;
+      var bossMaxHP = 1000;
+      var bossHP = 0;
+      var bossHealthBar, bossHealthBarContainer;
+      var isBossLevel = false;
       var hpText = null;
       var firingRate = 2000;
       var firingCount = 1;
@@ -98,9 +109,13 @@
         roundNumber++;
         console.log( "ROUND:", roundNumber );
         if( roundNumber >= roundCount ) {
-          // TODO: BOSS TIME!
           roundNumber = 0;
           enemyLevel++;
+          if( enemyLevel >= 5 ) {
+            // FINAL BOSS
+            startBattle();
+            spawnCaptain( 640, 360, bossMaxHP );
+          }
         }
         speechBubbles.forEach( s => s.visible = false );
         speechBubbleText.visible = false;
@@ -192,6 +207,10 @@
         if( closestEnemy >= 0 ) {
           var enemy = enemies[ closestEnemy ];
           var dX = enemy.position.x - pX, dY = enemy.position.y - pY;
+          tpAimAngle = Math.atan2( dY, dX );
+        }
+        else if( isBossLevel ) {
+          var dX = 640 - pX, dY = 360 - pY;
           tpAimAngle = Math.atan2( dY, dX );
         }
         // else {
@@ -436,10 +455,10 @@
         setTimeout( () => {
           isSpawningEnemies = false;
           for( var i = 0; i < size; i++ ) {
-            if( enemyLevel > 3 ) {
+            if( enemyLevel > 2 ) {
               var chance = Math.random();
-              if( chance < 0.25 ) {
-                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, ( enemyLevel - 2 ) * 3 + 1, 0.5, "tank" );
+              if( chance < 0.1 ) {
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, ( enemyLevel - 2 ) * 20 + 1, 0.5, "tank" );
                 i++;
               }
               else if( chance < 0.50 ) {
@@ -473,6 +492,75 @@
         //   }
           
         // }, 500 );
+      }
+
+      function spawnCaptain( x, y, health ) {
+        bossHP = health;
+        let boss = Unicorn.AddObject( "enemybosscat", {
+          type: "circle",
+          x, y,
+          radius: 100,
+          bounce: 0,
+          sprite: "skittleBlue",
+          isStatic: true,
+          onEnter: ( label, body ) => {
+            // Check for bullets!
+            if( label.startsWith( "skittle" ) ) {
+              // KABOOM
+              let candyPieces = Unicorn.AddParticles( "candy" + counter++, {
+                  shape: "circle", // "cone", "line"
+                  startColor: body.color,
+                  endColor: body.color,
+                  blendMode: PIXI.BLEND_MODES.OVERLAY,
+                  intensity: 10, // Scale from 1 - 10
+                  minSpeed: 0.1,
+                  maxSpeed: 0.25,
+                  decay: 1, // Scale from 0 - 10
+                }, body.position.x, body.position.y );
+              setTimeout( () => {
+                  Unicorn.RemoveParticles( candyPieces.name );
+                }, 100 );
+              // console.log( body );
+              // Remove Skittle
+              var skittleIndex = skittles.findIndex( s => s.label === label );
+              if( skittleIndex >= 0 ) {
+                skittles.splice( skittleIndex, 1 );
+              }
+              Unicorn.RemoveObject( label );
+              bossHP--;
+              if( bossHP <= 0 ) {
+                // DED BOSS
+                let explosion = Unicorn.AddParticles( "explosion" + counter++, {
+                  shape: "circle", // "cone", "line"
+                  startColor: "#FB8200",
+                  endColor: "#FEBE79",
+                  intensity: 10, // Scale from 1 - 10
+                  minSpeed: 0.1,
+                  maxSpeed: 0.25,
+                  decay: 1, // Scale from 0 - 10
+                }, boss.position.x, boss.position.y );
+                let pieces = Unicorn.AddParticles( "pieces" + counter++, {
+                  shape: "circle", // "cone", "line"
+                  startColor: "#4A4957",
+                  endColor: "#4A4957",
+                  blendMode: PIXI.BLEND_MODES.DARKEN,
+                  intensity: 10, // Scale from 1 - 10
+                  minSpeed: 0.01,
+                  maxSpeed: 0.025,
+                  decay: 1, // Scale from 0 - 10
+                }, boss.position.x, boss.position.y );
+                setTimeout( () => {
+                  Unicorn.RemoveParticles( explosion.name );
+                  Unicorn.RemoveParticles( pieces.name );
+                }, 100 );
+                Unicorn.RemoveObject( boss.label );
+              }
+            }
+          }
+        } );
+        boss.sprite.alpha = 0;
+        isBossLevel = true;
+        bossTimer = 3000;
       }
 
       function Init() {
@@ -509,6 +597,10 @@
         Unicorn.Load( "speechLongL", "assets/speechBubbleLongL.png" );
         Unicorn.Load( "speechLongR", "assets/speechBubbleLongR.png" );
         Unicorn.Load( "timerBar", "assets/timerBar.png" );
+        Unicorn.Load( "bosscat1", "assets/catastrophe1.png" );
+        Unicorn.Load( "bosscat2", "assets/catastrophe2.png" );
+        Unicorn.Load( "healthBar", "assets/healthBarFull.png" );
+        Unicorn.Load( "healthBarContainer", "assets/healthBarEmpty.png" );
         // Unicorn.AddText( "title", "Rainbow Rampage", 50, 50, {
         //   fontFamily: "Luckiest Guy",
         //   fontSize: 120,
@@ -529,6 +621,11 @@
         //   fontWeight: 'bold',
         //   fill: "#000000"
         // });
+        bosscat.push( Unicorn.AddOverlay( "bosscat1", "bosscat1", -1000, 0 ) );
+        bosscat.push( Unicorn.AddOverlay( "bosscat2", "bosscat2", -1000, 0 ) );
+        bosscat.forEach( b => b.anchor.set( 0.5 ) );
+        bossHealthBarContainer = Unicorn.AddOverlay( "healthBarContainer", "healthBarContainer", -1000, 0 );
+        bossHealthBar = Unicorn.AddOverlay( "healthBar", "healthBar", -1000, 0 );
         spawnTeapup( 640, 360, tpMaxHP );
         voteStar = Unicorn.AddOverlay( "star", "star", -1000, -1000 );
         tpVote.push( Unicorn.AddOverlay( "voteL", "voteL", -1000, -1000 ) );
@@ -646,21 +743,21 @@
             voteTimeBar.y = tpVote[ 0 ].y + 79;
           }
           if( power === maxVotes ) {
-            voteStar.x = voteText.x - 75;
-            voteStar.y = voteText.y - 45;
+            voteStar.x = voteText.x - 83;
+            voteStar.y = voteText.y - 65;
           }
           else if( speed === maxVotes ) {
-            voteStar.x = voteText.x + 70;
-            voteStar.y = voteText.y - 45;
+            voteStar.x = voteText.x + 62;
+            voteStar.y = voteText.y - 65;
           }
           else {
-            voteStar.x = voteText.x - 3;
-            voteStar.y = voteText.y - 45;
+            voteStar.x = voteText.x - 10;
+            voteStar.y = voteText.y - 65;
           }
           if( tpHP === 1 ) {
             // Auto-Select Heal
             voteTimer = 0;
-            tpHP += 2;
+            tpHP += 3;
             refreshVisibleHP();
             console.log( "Auto-Heal" );
             winningUpgrade = 2;
@@ -684,9 +781,9 @@
             else if( speed === maxVotes ) {
               console.log( "SPEED UP" );
               numFiringRateUpgrades++;
-              // firingRate *= 1 - 1 / numFiringRateUpgrades;
-              firingRate *= 0.5;
-              tpSpeed++;
+              firingRate *= 1 - 1 / numFiringRateUpgrades;
+              // firingRate *= 0.5;
+              tpSpeed += 0.5;
               tpHP--;
               refreshVisibleHP();
               winningUpgrade = 1;
@@ -694,7 +791,7 @@
             else {
               console.log( "HEAL UP" );
               if( tpHP < tpMaxHP ) {
-                tpHP += 2;
+                tpHP += 3;
                 if( tpHP > tpMaxHP ) {
                   tpHP = tpMaxHP;
                 }
@@ -771,6 +868,30 @@
             }
           }
 
+          if( isBossLevel ) {
+            bossTimer -= timeDiffInMs;
+            if( bossTimer < 0 ) {
+              bossTimer = 10000;
+              spawnEnemyWave( 1 );
+            }
+            if( Math.floor( timestamp / 1000 ) % 2 == 0 ) {
+              bosscat[ 0 ].x = 640;
+              bosscat[ 0 ].y = 360;
+              bosscat[ 1 ].x = -1000;
+            }
+            else {
+              bosscat[ 1 ].x = 640;
+              bosscat[ 1 ].y = 360;
+              bosscat[ 0 ].x = -1000;
+            }
+            bossHealthBarContainer.x = 540;
+            bossHealthBarContainer.y = 260;
+            bossHealthBar.x = 540;
+            bossHealthBar.y = 260;
+            bossHealthBar.transform.scale.x = bossHP / bossMaxHP;
+            /// !!!!!!!
+          }
+
           if( isSpawningEnemies ) {
             warpSize += timeDiffInMs / 1000 * 2;
             if( warpSize > 1 ) {
@@ -800,7 +921,7 @@
             if( waveNumber < waveCount ) {
               waveNumber++;
               console.log( "WAVE:", waveNumber );
-              spawnEnemyWave( ( enemyLevel - 1 ) * 3 + roundNumber );
+              spawnEnemyWave( ( enemyLevel - 1 ) * 2 + roundNumber );
             }
             else if( enemies.length <= 0 ) {
               startVote();
@@ -892,11 +1013,11 @@
         Unicorn.Create( "unicorn-display", {
           width: 1280,
           height: 720,
-          // background: 0x777777,// "transparent",
-          background: "transparent",
+          background: 0x777777,// "transparent",
+          // background: "transparent",
           init: Init,
           update: Update,
-          channel: "Instafluff",
+          channel: "instafriend",
           onCommand: OnChatCommand,
           onChat: OnChatMessage,
           // screenWalls: false, // Default: true

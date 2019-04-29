@@ -12,8 +12,11 @@ COMPLETED:
    *- show current vote counts
    *- show timer
    *- show winning vote and the upgrade applied
+- Adjust voting star position
+- Update the voting to show heal for 3 hearts
 
 TODO:
+
 
 - Wave Count + Enemy Level
    (Each boss = 1 level = 3 rounds. 1 round = 3 waves)
