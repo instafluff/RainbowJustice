@@ -83,6 +83,8 @@ visible upgrades for teapup from trike to motorized, skittle bullets,
 
 - Hall-o-Wheels
 - Dystopian society where halloween has been banned. A scientist reminiscing about the past created Teapup before passing, its job bring, halloween back
+- Prof. Fluffington was the scientist that created Teapup
+- Teapup is the secret agent working with Professor Fluffington to bring Halloween back
 
 - Teapup is fighting against Candy-stealing robots/drones: Sweets Sniffers, Bitter Bots, Sugar Searchers, Reese's Raiders, Dum Dum Drones, P.B. Reese, No Gum Gum, Caffeine, Soylent, Colonel Mustard, Pez Pluggers, Lemon-aids, Coffee Crisp Crushers, Matcha Dog, Salmon Ella, Hash Brown, Squid Eye, BOB, Devil Cinnamon, Gum Getters, Doughnut Dummy
 
@@ -114,6 +116,9 @@ How about having one person per game that can register as teapup's assistent tha
 
 - Survive 60s
 - Wave 1: 3 bots at all times, every 10s = 1 extra drone
+
+
+
 
 
 

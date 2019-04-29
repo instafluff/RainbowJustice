@@ -30,6 +30,16 @@
       }());
       /* eslint-enabled */
 
+      var teapupQuotes = [
+        "TASTE MY RAINBOW MOMMAPUPPERS!!",
+        "Skittle, skedaddle.",
+        "Vroom vroom.. to your DOOM!",
+        "NO HALLOWEEN MAKES TPUP HANGRY!",
+        "This one is for Prof. Fluffington!",
+        // "I'll be back!",
+        "Winner Winner Skittles Dinner",
+      ];
+
       var gameState = "vote"; // vote, battle, end
       var counter = 0;
       var tpTrike = null;
@@ -61,7 +71,7 @@
       var firingCount = 1;
       var fireTime = 0;
       var skittles = [];
-      var voteTime = 1000; // 60000
+      var voteTime = 10000; // 60000
       var voteTimer = 0;
       var votes = {};
 
@@ -270,7 +280,7 @@
           type: "rectangle",
           x, y,
           width: 50, height: 50,
-          // sprite: "unicorn",
+          sprite: "robot",
           bounce: 0,
           onEnter: ( label, body ) => {
             // Check for bullets!
@@ -309,7 +319,7 @@
           y += 360;
         }
         for( var i = 0; i < size; i++ ) {
-          spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, enemyLevel, 2 );
+          spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, enemyLevel, 1 );
         }
         // let spawner = setInterval( () => {
         //   size--;
@@ -324,6 +334,7 @@
         // Add Initialization Here
         Unicorn.Load( "heart_empty", "assets/heartEmpty.png" );
         Unicorn.Load( "heart_full", "assets/heartFull.png" );
+        Unicorn.Load( "robot", "assets/robot.png" );
         Unicorn.Load( "tricycle", "assets/teapupTrike.png" );
         Unicorn.Load( "teapup", "assets/teapup.png" );
         Unicorn.Load( "voteL", "assets/voteBubbleL.png" );
@@ -332,12 +343,12 @@
         Unicorn.Load( "speechR", "assets/speechBubbleR.png" );
         Unicorn.Load( "speechLongL", "assets/speechBubbleLongL.png" );
         Unicorn.Load( "speechLongR", "assets/speechBubbleLongR.png" );
-        Unicorn.AddText( "title", "Rainbow Rampage", 50, 50, {
-          fontFamily: "Luckiest Guy",
-          fontSize: 120,
-          // fontWeight: 'bold',
-          fill: "#000000"
-        });
+        // Unicorn.AddText( "title", "Rainbow Rampage", 50, 50, {
+        //   fontFamily: "Luckiest Guy",
+        //   fontSize: 120,
+        //   // fontWeight: 'bold',
+        //   fill: "#000000"
+        // });
         for( var i = 0; i < tpMaxHP; i++ ) {
           tpEmptyHearts.push( Unicorn.AddOverlay( "heart_empty" + i, "heart_empty", 100, 100 ) );
           tpFullHearts.push( Unicorn.AddOverlay( "heart_full" + i, "heart_full", 100, 100 ) );
@@ -572,6 +583,7 @@
             var dY = tpTrike.position.y - x.position.y;
             var length = Math.sqrt( dX * dX + dY * dY );
             // console.log( x );
+            x.angle = Math.atan2( dY, dX );
             Matter.Body.setVelocity( x, { x: dX / length * x.moveSpeed, y: dY / length * x.moveSpeed });
           });
         }
