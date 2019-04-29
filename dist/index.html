@@ -330,12 +330,31 @@
         tpImage.anchor.set( 0.5 );
       }
 
-      function spawnEnemy( x, y, health, speed ) {
+      function spawnEnemy( x, y, health, speed, type ) {
+        var objectType, sprite, size;
+        switch( type ) {
+          case "robot":
+            objectType = "rectangle";
+            sprite = "robot";
+            size = 50;
+            break;
+          case "drone":
+            objectType = "circle";
+            sprite = "drone";
+            size = 25;
+            break;
+          case "tank":
+            objectType = "rectangle";
+            sprite = "tank";
+            size = 100;
+            break;
+        }
         let enemy = Unicorn.AddObject( "enemy" + counter++, {
-          type: "rectangle",
+          type: objectType,
           x, y,
-          width: 50, height: 50,
-          sprite: "robot",
+          width: size, height: size,
+          radius: size,
+          sprite: sprite,
           bounce: 0,
           onEnter: ( label, body ) => {
             // Check for bullets!
@@ -417,7 +436,34 @@
         setTimeout( () => {
           isSpawningEnemies = false;
           for( var i = 0; i < size; i++ ) {
-            spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, ( enemyLevel - 1 ) * 2 + 1, 1 );
+            if( enemyLevel > 3 ) {
+              var chance = Math.random();
+              if( chance < 0.25 ) {
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, ( enemyLevel - 2 ) * 3 + 1, 0.5, "tank" );
+                i++;
+              }
+              else if( chance < 0.50 ) {
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, ( enemyLevel - 1 ) + 1, 1, "robot" );
+              }
+              else {
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, 1, 3, "drone" );
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, 1, 3, "drone" );
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, 1, 3, "drone" );
+              }
+            }
+            else if( enemyLevel > 1 ) {
+              if( Math.random() < 0.25 ) {
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, ( enemyLevel - 1 ) + 1, 1, "robot" );
+              }
+              else {
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, 1, 3, "drone" );
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, 1, 3, "drone" );
+                spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, 1, 3, "drone" );
+              }
+            }
+            else {
+              spawnEnemy( x + Math.random() * 10, y + Math.random() * 10, ( enemyLevel - 1 ) + 1, 1, "robot" );
+            }
           }
         }, 500 );
         // let spawner = setInterval( () => {
@@ -451,6 +497,8 @@
         Unicorn.Load( "warpDark", "assets/warpDark.png" );
         Unicorn.Load( "warpLight", "assets/warpLight.png" );
         Unicorn.Load( "robot", "assets/robot.png" );
+        Unicorn.Load( "drone", "assets/drone.png" );
+        Unicorn.Load( "tank", "assets/tank.png" );
         Unicorn.Load( "tricycle", "assets/teapupTrike.png" );
         Unicorn.Load( "teapup", "assets/teapup.png" );
         Unicorn.Load( "star", "assets/star.png" );
@@ -628,7 +676,7 @@
             voteStar.x = -1000;
             if( power === maxVotes ) {
               console.log( "POWER UP" );
-              firingCount++;
+              firingCount += 2;
               tpHP--;
               refreshVisibleHP();
               winningUpgrade = 0;
@@ -636,7 +684,8 @@
             else if( speed === maxVotes ) {
               console.log( "SPEED UP" );
               numFiringRateUpgrades++;
-              firingRate *= 1 - 1 / numFiringRateUpgrades;
+              // firingRate *= 1 - 1 / numFiringRateUpgrades;
+              firingRate *= 0.5;
               tpSpeed++;
               tpHP--;
               refreshVisibleHP();
@@ -703,11 +752,11 @@
           tpVote[ 1 ].visible = false;
           if( shieldTimer > 0 ) {
             shieldTimer -= timeDiffInMs;
-            tpImage.alpha = 0.75 + Math.sin( timestamp / 100 ) * 0.5;
+            tpTrike.sprite.alpha = tpImage.alpha = 0.75 + Math.sin( timestamp / 100 ) * 0.5;
             tpImage.tint = lerpColor( 0xff0000, 0xffffff, Math.min( tpImage.alpha, 1 ) );
           }
           else {
-            tpImage.alpha = 1;
+            tpTrike.sprite.alpha = tpImage.alpha = 1;
             tpImage.tint = 0xffffff;
           }
 
@@ -747,14 +796,14 @@
           warpLight.transform.rotation = -timestamp / 100 * 0.576273;
 
           // Spawn enemies when the current wave is defeated
-          if( !isSpawningEnemies && enemies.length <= 0 ) {
-            waveNumber++;
-            if( waveNumber > waveCount ) {
-              startVote();
-            }
-            else {
+          if( !isSpawningEnemies ) {
+            if( waveNumber < waveCount ) {
+              waveNumber++;
               console.log( "WAVE:", waveNumber );
-              spawnEnemyWave( ( enemyLevel - 1 ) * 3 + roundNumber * 3 + ( waveNumber - 1 ) );
+              spawnEnemyWave( ( enemyLevel - 1 ) * 3 + roundNumber );
+            }
+            else if( enemies.length <= 0 ) {
+              startVote();
             }
           }
 
