@@ -1,6 +1,7 @@
 <html>
   <head>
     <title>Rainbow Rampage</title>
+    <link href="https://fonts.googleapis.com/css?family=Bubblegum+Sans" rel="stylesheet">
     <link rel='stylesheet' href='unicorn.css' />
     <script src="pinkfluffyunicorn.min.js"></script>
     <script src="brain.min.js"></script>
@@ -8,28 +9,6 @@
   <body>
     <div id="unicorn-display"></div>
     <script>
-      window.WebFontConfig = {
-          google: {
-              families: ['Luckiest Guy', 'Geo'],
-          },
-          active() {
-              CreateGame();
-          },
-      };
-
-      /* eslint-disable */
-      // include the web-font loader script
-      (function() {
-          const wf = document.createElement('script');
-          wf.src = `${document.location.protocol === 'https:' ? 'https' : 'http'
-          }://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js`;
-          wf.type = 'text/javascript';
-          wf.async = 'true';
-          const s = document.getElementsByTagName('script')[0];
-          s.parentNode.insertBefore(wf, s);
-      }());
-      /* eslint-enabled */
-
       var gameState = "vote"; // vote, battle, end
       var counter = 0;
       var tpTrike = null;
@@ -41,12 +20,6 @@
       var tpSpeed = 2;
       var tpAimAngle = 0;
       var tpImage;
-      var tpVote = [];
-      var voteText;
-      var speechBubbles = [];
-      var speechBubbleText;
-      var isLongSpeechText = false;
-      var isSpeechBubbleShowing = false;
       var shieldTime = 2000;
       var shieldTimer = 2000;
       // 3 waves per round, 3 rounds before a boss
@@ -78,23 +51,6 @@
           roundNumber = 0;
           enemyLevel++;
         }
-        speechBubbles.forEach( s => s.visible = false );
-        speechBubbleText.visible = false;
-      }
-
-      function showSpeechBubble( text ) {
-        isSpeechBubbleShowing = true;
-        isLongSpeechText = text.length > 20;
-        if( text.length >= 35 ) {
-          text = text.slice( 0, 33 ) + "..";
-        }
-        speechBubbleText.visible = true;
-        setTimeout( () => {
-          isSpeechBubbleShowing = false;
-          speechBubbleText.visible = false;
-          speechBubbles.forEach( x => x.visible = false );
-        }, 3000 );
-        speechBubbleText.text = text;
       }
 
       function startBattle() {
@@ -166,10 +122,10 @@
           var dX = enemy.position.x - pX, dY = enemy.position.y - pY;
           tpAimAngle = Math.atan2( dY, dX );
         }
-        // else {
-        //   // Turn towards where Teapup is moving
-        //   tpAimAngle = tpAngle;
-        // }
+        else {
+          // Turn towards where Teapup is moving
+          tpAimAngle = tpAngle;
+        }
         tpImage.transform.rotation = tpAimAngle;
       }
 
@@ -326,16 +282,10 @@
         Unicorn.Load( "heart_full", "assets/heartFull.png" );
         Unicorn.Load( "tricycle", "assets/teapupTrike.png" );
         Unicorn.Load( "teapup", "assets/teapup.png" );
-        Unicorn.Load( "voteL", "assets/voteBubbleL.png" );
-        Unicorn.Load( "voteR", "assets/voteBubbleR.png" );
-        Unicorn.Load( "speechL", "assets/speechBubbleL.png" );
-        Unicorn.Load( "speechR", "assets/speechBubbleR.png" );
-        Unicorn.Load( "speechLongL", "assets/speechBubbleLongL.png" );
-        Unicorn.Load( "speechLongR", "assets/speechBubbleLongR.png" );
-        Unicorn.AddText( "title", "Rainbow Rampage", 50, 50, {
-          fontFamily: "Luckiest Guy",
-          fontSize: 120,
-          // fontWeight: 'bold',
+        Unicorn.AddText( "title", "Teapup Game Prototype 2", 50, 50, {
+          fontFamily: 'Bubblegum Sans',
+          fontSize: 36,
+          fontWeight: 'bold',
           fill: "#000000"
         });
         for( var i = 0; i < tpMaxHP; i++ ) {
@@ -349,30 +299,6 @@
         //   fill: "#000000"
         // });
         spawnTeapup( 640, 360, tpMaxHP );
-        tpVote.push( Unicorn.AddOverlay( "voteL", "voteL", 0, 0 ) );
-        tpVote.push( Unicorn.AddOverlay( "voteR", "voteR", 0, 0 ) );
-        tpVote.forEach( x => x.visible = false );
-        voteText = Unicorn.AddText( "bubbleText", "!power   !heal   !speed", 120, 35, {
-          fontFamily: "Geo",
-          fontSize: 24,
-          fontWeight: 'bold',
-          fill: "#051155"
-        });
-        voteText.anchor.set( 0.5 );
-        voteText.visible = false;
-        speechBubbles.push( Unicorn.AddOverlay( "speechL", "speechL", 0, 0 ) );
-        speechBubbles.push( Unicorn.AddOverlay( "speechR", "speechR", 0, 0 ) );
-        speechBubbles.push( Unicorn.AddOverlay( "speechLongL", "speechLongL", 0, 0 ) );
-        speechBubbles.push( Unicorn.AddOverlay( "speechLongR", "speechLongR", 0, 0 ) );
-        speechBubbles.forEach( x => x.visible = false );
-        speechBubbleText = Unicorn.AddText( "bubbleText", "Taste my rainbow!", 120, 55, {
-          fontFamily: "Geo",
-          fontSize: 24,
-          fontWeight: 'bold',
-          fill: "#051155"
-        });
-        speechBubbleText.anchor.set( 0.5 );
-        speechBubbleText.visible = false;
         // Unicorn.AddDetector( "detect", {
         //   type: "rectangle",
         //   x: 64, y: 300,
@@ -414,32 +340,9 @@
         tpImage.x = tpTrike.position.x;
         tpImage.y = tpTrike.position.y;
 
-        voteText.visible = false;
-
         if( gameState === "vote" ) {
           if( voteTimer > 0 ) {
             voteTimer -= timeDiffInMs;
-          }
-
-          driveTeapup( timeDiffInMs );
-          aimTeapup( timeDiffInMs );
-
-          voteText.visible = true;
-          if( tpTrike.position.x < 300 ) {
-            tpVote[ 0 ].visible = false;
-            tpVote[ 1 ].visible = true;
-            tpVote[ 1 ].x = tpTrike.position.x + 30;
-            tpVote[ 1 ].y = tpTrike.position.y - 120;
-            voteText.x = tpVote[ 1 ].x + 120;
-            voteText.y = tpVote[ 1 ].y + 40;
-          }
-          else {
-            tpVote[ 1 ].visible = false;
-            tpVote[ 0 ].visible = true;
-            tpVote[ 0 ].x = tpTrike.position.x - 300;
-            tpVote[ 0 ].y = tpTrike.position.y - 140;
-            voteText.x = tpVote[ 0 ].x + 120;
-            voteText.y = tpVote[ 0 ].y + 40;
           }
           if( tpHP === 1 ) {
             // Auto-Select Heal
@@ -488,49 +391,8 @@
             startBattle();
           }
         }
-        else {
-          if( isSpeechBubbleShowing ) {
-            var textIndex = isLongSpeechText ? 2 : 0;
-            var textOffset = isLongSpeechText ? 80 : 0;
-            speechBubbles.forEach( s => s.visible = false );
-            if( isLongSpeechText ) {
-              if( tpTrike.position.x < 500 ) {
-                speechBubbles[ textIndex + 1 ].visible = true;
-                speechBubbles[ textIndex + 1 ].x = tpTrike.position.x + 30;
-                speechBubbles[ textIndex + 1 ].y = tpTrike.position.y - 120;
-                speechBubbleText.x = speechBubbles[ textIndex + 1 ].x + textOffset + 120;
-                speechBubbleText.y = speechBubbles[ textIndex + 1 ].y + 55;
-              }
-              else {
-                speechBubbles[ textIndex + 0 ].visible = true;
-                speechBubbles[ textIndex + 0 ].x = tpTrike.position.x - 440;
-                speechBubbles[ textIndex + 0 ].y = tpTrike.position.y - 140;
-                speechBubbleText.x = speechBubbles[ textIndex + 0 ].x + textOffset + 120;
-                speechBubbleText.y = speechBubbles[ textIndex + 0 ].y + 55;
-              }
-            }
-            else {
-              if( tpTrike.position.x < 300 ) {
-                speechBubbles[ textIndex + 1 ].visible = true;
-                speechBubbles[ textIndex + 1 ].x = tpTrike.position.x + 30;
-                speechBubbles[ textIndex + 1 ].y = tpTrike.position.y - 120;
-                speechBubbleText.x = speechBubbles[ textIndex + 1 ].x + textOffset + 120;
-                speechBubbleText.y = speechBubbles[ textIndex + 1 ].y + 55;
-              }
-              else {
-                speechBubbles[ textIndex + 0 ].visible = true;
-                speechBubbles[ textIndex + 0 ].x = tpTrike.position.x - 300;
-                speechBubbles[ textIndex + 0 ].y = tpTrike.position.y - 140;
-                speechBubbleText.x = speechBubbles[ textIndex + 0 ].x + textOffset + 120;
-                speechBubbleText.y = speechBubbles[ textIndex + 0 ].y + 55;
-              }
-            }
-          }
-        }
 
         if( gameState === "battle" ) {
-          tpVote[ 0 ].visible = false;
-          tpVote[ 1 ].visible = false;
           if( shieldTimer > 0 ) {
             shieldTimer -= timeDiffInMs;
           }
@@ -597,11 +459,6 @@
               break;
           }
         }
-        else {
-          if( command === "say" ) {
-            showSpeechBubble( message );
-          }
-        }
 
         if( command === "pupgrade" ) {
           if( tpHP > 1 ) {
@@ -624,10 +481,7 @@
         return Math.floor( Math.random() * Math.floor( max ) );
       }
 
-      // window.addEventListener('load', () => {
-      // });
-
-      function CreateGame() {
+      window.addEventListener('load', () => {
         Unicorn.Create( "unicorn-display", {
           width: 1280,
           height: 720,
@@ -645,7 +499,7 @@
         });
         // TODO: Start game via chat command
         startVote();
-      }
+      });
     </script>
   </body>
 </html>
