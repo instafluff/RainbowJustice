@@ -6,8 +6,15 @@ COMPLETED:
 - Voting (!power !speed !heal) - auto-heals when only 1 heart
 - Selected Font: Luckiest Guy
 - Add Particle Effects!
+- Voting stage interface
+   *- !power, !speed, !heal
+   *- show cost of each
+   *- show current vote counts
+   *- show timer
+   *- show winning vote and the upgrade applied
 
 TODO:
+
 - Wave Count + Enemy Level
    (Each boss = 1 level = 3 rounds. 1 round = 3 waves)
    - "LEVEL CLEARED!" (Teapup moves from current to next level in a side-scroll map)
@@ -17,13 +24,6 @@ TODO:
    - Warp spawn for the wave to come in
    - HP Bar for enemies
 
-- Voting stage interface
-   *- !power, !speed, !heal
-   *- show cost of each
-   - show current vote counts
-   - show timer
-   - show winning vote and the upgrade applied
-
 - ARTS!!!
    *- Minion Police Robots
    *- Warp Portal for robots
@@ -31,6 +31,17 @@ TODO:
    *- Pixel Skittles
    - Bosses
    *- Title Image (cyberpunk title logo)
+   - Game Over Image
+
+- SOUND FX!
+   - Skittle Gun Sound
+   - Skittle Impact Sound
+   - Robot Explosion
+   - Teapup Pain Sound
+   - Death
+   - Tricycle vroom
+   - Warp sound
+   - Upgrade sound
 
 - Scoreboard for chat
 

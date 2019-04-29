@@ -53,7 +53,11 @@
       var tpAimAngle = 0;
       var tpImage;
       var tpVote = [];
+      var voteStar;
       var voteText;
+      var upgradeImages = [];
+      var winningUpgrade = 0;
+      var upgradeAnimTimer = 0;
       var speechBubbles = [];
       var speechBubbleText;
       var isLongSpeechText = false;
@@ -75,14 +79,19 @@
       var firingCount = 1;
       var fireTime = 0;
       var skittles = [];
-      var voteTime = 1000; // 60000
+      var voteTime = 30000;
       var voteTimer = 0;
+      var voteTimeBar;
       var votes = {};
+      var votePower = Math.random() * 0.1, voteSpeed = Math.random() * 0.1, voteHeal = Math.random() * 0.1;
 
       function startVote() {
         gameState = "vote";
         voteTimer = voteTime;
         votes = {};
+        votePower = Math.random() * 0.1;
+        voteSpeed = Math.random() * 0.1;
+        voteHeal = Math.random() * 0.1;
         console.log( "Vote: !power !speed !heal" );
         waveNumber = 0;
         roundNumber++;
@@ -94,6 +103,8 @@
         }
         speechBubbles.forEach( s => s.visible = false );
         speechBubbleText.visible = false;
+        tpImage.alpha = 1;
+        tpImage.tint = 0xffffff;
       }
 
       function showSpeechBubble( text ) {
@@ -118,6 +129,8 @@
       function endGame() {
         gameState = "end";
         tpTrike.isStatic = true;
+        tpImage.alpha = 1;
+        tpImage.tint = 0xffffff;
       }
 
       function aiCompute( rayVals ) {
@@ -431,17 +444,22 @@
         Unicorn.Load( "exhaustRed", "assets/exhaustRed.png" );
         Unicorn.Load( "exhaustViolet", "assets/exhaustViolet.png" );
         Unicorn.Load( "exhaustYellow", "assets/exhaustYellow.png" );
+        Unicorn.Load( "powerup", "assets/powerup.png" );
+        Unicorn.Load( "speedup", "assets/speedup.png" );
+        Unicorn.Load( "healup", "assets/healup.png" );
         Unicorn.Load( "warpDark", "assets/warpDark.png" );
         Unicorn.Load( "warpLight", "assets/warpLight.png" );
         Unicorn.Load( "robot", "assets/robot.png" );
         Unicorn.Load( "tricycle", "assets/teapupTrike.png" );
         Unicorn.Load( "teapup", "assets/teapup.png" );
+        Unicorn.Load( "star", "assets/star.png" );
         Unicorn.Load( "voteL", "assets/voteBubbleL.png" );
         Unicorn.Load( "voteR", "assets/voteBubbleR.png" );
         Unicorn.Load( "speechL", "assets/speechBubbleL.png" );
         Unicorn.Load( "speechR", "assets/speechBubbleR.png" );
         Unicorn.Load( "speechLongL", "assets/speechBubbleLongL.png" );
         Unicorn.Load( "speechLongR", "assets/speechBubbleLongR.png" );
+        Unicorn.Load( "timerBar", "assets/timerBar.png" );
         // Unicorn.AddText( "title", "Rainbow Rampage", 50, 50, {
         //   fontFamily: "Luckiest Guy",
         //   fontSize: 120,
@@ -463,8 +481,9 @@
         //   fill: "#000000"
         // });
         spawnTeapup( 640, 360, tpMaxHP );
-        tpVote.push( Unicorn.AddOverlay( "voteL", "voteL", 0, 0 ) );
-        tpVote.push( Unicorn.AddOverlay( "voteR", "voteR", 0, 0 ) );
+        voteStar = Unicorn.AddOverlay( "star", "star", -1000, -1000 );
+        tpVote.push( Unicorn.AddOverlay( "voteL", "voteL", -1000, -1000 ) );
+        tpVote.push( Unicorn.AddOverlay( "voteR", "voteR", -1000, -1000 ) );
         tpVote.forEach( x => x.visible = false );
         voteText = Unicorn.AddText( "bubbleText", "!power   !heal   !speed", 120, 35, {
           fontFamily: "Geo",
@@ -474,10 +493,11 @@
         });
         voteText.anchor.set( 0.5 );
         voteText.visible = false;
-        speechBubbles.push( Unicorn.AddOverlay( "speechL", "speechL", 0, 0 ) );
-        speechBubbles.push( Unicorn.AddOverlay( "speechR", "speechR", 0, 0 ) );
-        speechBubbles.push( Unicorn.AddOverlay( "speechLongL", "speechLongL", 0, 0 ) );
-        speechBubbles.push( Unicorn.AddOverlay( "speechLongR", "speechLongR", 0, 0 ) );
+        voteTimeBar = Unicorn.AddOverlay( "timerBar", "timerBar", -1000, 0 );
+        speechBubbles.push( Unicorn.AddOverlay( "speechL", "speechL", -1000, 0 ) );
+        speechBubbles.push( Unicorn.AddOverlay( "speechR", "speechR", -1000, 0 ) );
+        speechBubbles.push( Unicorn.AddOverlay( "speechLongL", "speechLongL", -1000, 0 ) );
+        speechBubbles.push( Unicorn.AddOverlay( "speechLongR", "speechLongR", -1000, 0 ) );
         speechBubbles.forEach( x => x.visible = false );
         speechBubbleText = Unicorn.AddText( "bubbleText", "Taste my rainbow!", 120, 55, {
           fontFamily: "Geo",
@@ -487,6 +507,11 @@
         });
         speechBubbleText.anchor.set( 0.5 );
         speechBubbleText.visible = false;
+
+        upgradeImages.push( Unicorn.AddOverlay( "powerup", "powerup", -1000, 0 ) );
+        upgradeImages.push( Unicorn.AddOverlay( "speedup", "speedup", -1000, 0 ) );
+        upgradeImages.push( Unicorn.AddOverlay( "healup", "healup", -1000, 0 ) );
+        upgradeImages.forEach( u => u.anchor.set( 0.5 ) );
         // Unicorn.AddDetector( "detect", {
         //   type: "rectangle",
         //   x: 64, y: 300,
@@ -499,6 +524,9 @@
         // }, ( label, body ) => {
         //   console.log( "Exit:", label, body );
         // } );
+
+        // TODO: Start game via chat command
+        startVote();
       }
 
       function Update( timestamp, timeDiffInMs ) {
@@ -531,10 +559,21 @@
         if( gameState === "vote" ) {
           if( voteTimer > 0 ) {
             voteTimer -= timeDiffInMs;
+            voteTimeBar.transform.scale.x = voteTimer / voteTime;
           }
 
           driveTeapup( timeDiffInMs );
           aimTeapup( timeDiffInMs );
+
+          var power = votePower, speed = voteSpeed, heal = voteHeal;
+          Object.keys( votes ).forEach( v => {
+            switch( votes[ v ] ) {
+              case "power": power++; break;
+              case "speed": speed++; break;
+              case "heal": heal++; break;
+            }
+          } );
+          var maxVotes = Math.max( power, Math.max( speed, heal ) );
 
           voteText.visible = true;
           if( tpTrike.position.x < 300 ) {
@@ -544,6 +583,8 @@
             tpVote[ 1 ].y = tpTrike.position.y - 120;
             voteText.x = tpVote[ 1 ].x + 120;
             voteText.y = tpVote[ 1 ].y + 40;
+            voteTimeBar.x = tpVote[ 1 ].x + 10;
+            voteTimeBar.y = tpVote[ 1 ].y + 79;
           }
           else {
             tpVote[ 1 ].visible = false;
@@ -552,6 +593,20 @@
             tpVote[ 0 ].y = tpTrike.position.y - 140;
             voteText.x = tpVote[ 0 ].x + 120;
             voteText.y = tpVote[ 0 ].y + 40;
+            voteTimeBar.x = tpVote[ 0 ].x + 9;
+            voteTimeBar.y = tpVote[ 0 ].y + 79;
+          }
+          if( power === maxVotes ) {
+            voteStar.x = voteText.x - 75;
+            voteStar.y = voteText.y - 45;
+          }
+          else if( speed === maxVotes ) {
+            voteStar.x = voteText.x + 70;
+            voteStar.y = voteText.y - 45;
+          }
+          else {
+            voteStar.x = voteText.x - 3;
+            voteStar.y = voteText.y - 45;
           }
           if( tpHP === 1 ) {
             // Auto-Select Heal
@@ -559,26 +614,23 @@
             tpHP += 2;
             refreshVisibleHP();
             console.log( "Auto-Heal" );
+            winningUpgrade = 2;
+            upgradeAnimTimer = 2000;
+            voteTimeBar.x = -1000;
+            voteStar.x = -1000;
             startBattle();
           }
           else if( voteTimer <= 0 ) {
-            var power = Math.random() * 0.1, speed = Math.random() * 0.1, heal = Math.random() * 0.1;
-            Object.keys( votes ).forEach( v => {
-              switch( votes[ v ] ) {
-                case "power": power++; break;
-                case "speed": speed++; break;
-                case "heal": heal++; break;
-              }
-            } );
             console.log( "Power:", power );
             console.log( "Speed:", speed );
             console.log( "Heal:", heal );
-            var maxVotes = Math.max( power, Math.max( speed, heal ) );
+            voteStar.x = -1000;
             if( power === maxVotes ) {
               console.log( "POWER UP" );
               firingCount++;
               tpHP--;
               refreshVisibleHP();
+              winningUpgrade = 0;
             }
             else if( speed === maxVotes ) {
               console.log( "SPEED UP" );
@@ -586,6 +638,7 @@
               tpSpeed++;
               tpHP--;
               refreshVisibleHP();
+              winningUpgrade = 1;
             }
             else {
               console.log( "HEAL UP" );
@@ -596,7 +649,10 @@
                 }
                 refreshVisibleHP();
               }
+              winningUpgrade = 2;
             }
+            upgradeAnimTimer = 2000;
+            voteTimeBar.x = -1000;
             startBattle();
           }
         }
@@ -651,6 +707,17 @@
           else {
             tpImage.alpha = 1;
             tpImage.tint = 0xffffff;
+          }
+
+          if( upgradeAnimTimer > 0 ) {
+            upgradeAnimTimer -= timeDiffInMs;
+            var animProgress = upgradeAnimTimer / 2000;
+            upgradeImages[ winningUpgrade ].x = tpTrike.position.x;
+            upgradeImages[ winningUpgrade ].y = tpTrike.position.y - 240 + animProgress * 240;
+            upgradeImages[ winningUpgrade ].alpha = animProgress;
+            if( upgradeAnimTimer <= 0 ) {
+              upgradeImages[ winningUpgrade ].x = -1000;
+            }
           }
 
           if( isSpawningEnemies ) {
@@ -774,8 +841,8 @@
         Unicorn.Create( "unicorn-display", {
           width: 1280,
           height: 720,
-          // background: 0x777777,// "transparent",
-          background: "transparent",
+          background: 0x777777,// "transparent",
+          // background: "transparent",
           init: Init,
           update: Update,
           channel: "Instafluff",
@@ -786,8 +853,6 @@
           gravity: { x: 0, y: 0 },
           // gravity: { x: 0, y: 2 } // Default: { x: 0, y: 1 }
         });
-        // TODO: Start game via chat command
-        startVote();
       }
     </script>
   </body>
