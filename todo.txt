@@ -14,6 +14,7 @@ COMPLETED:
    *- show winning vote and the upgrade applied
 - Adjust voting star position
 - Update the voting to show heal for 3 hearts
+- Intro
 
 TODO:
 

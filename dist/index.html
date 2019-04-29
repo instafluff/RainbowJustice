@@ -62,7 +62,7 @@
         "AHHHHHHHHHHHHHHHHH"
       ];
 
-      var gameState = "start"; // start, vote, battle, end
+      var gameState = "start"; // start, vote, battle, end, win
       var introText = -1;
       var introTextTimer = 1000;
       var counter = 0;
@@ -102,6 +102,7 @@
       var bosscat = [];
       var bossTimer = 0;
       var bossMaxHP = 1000;
+      var bossEndLevel = 5;
       var bossHP = 0;
       var bossHealthBar, bossHealthBarContainer;
       var isBossLevel = false;
@@ -131,7 +132,7 @@
         if( roundNumber >= roundCount ) {
           roundNumber = 0;
           enemyLevel++;
-          if( enemyLevel >= 5 ) {
+          if( enemyLevel >= bossEndLevel ) {
             // FINAL BOSS
             startBattle();
             spawnCaptain( 640, 360, bossMaxHP );
@@ -171,10 +172,28 @@
         setTimeout( () => {
           showSpeechBubble( teapupGameOver[ getRandomInt( teapupGameOver.length ) ] );
         }, tpDeathTimer );
-        
+
         setTimeout( () => {
           location.reload();
         }, 20000 );
+      }
+
+      function winGame() {
+        gameState = "win";
+        tpTrike.isStatic = true;
+        tpImage.alpha = 1;
+        tpImage.tint = 0xffffff;
+        tpDeathTimer = 1500;
+        enemies.forEach( x => x.isStatic = true );
+        bossHealthBarContainer.x = -1000;
+        bossHealthBar.x = -1000;
+        setTimeout( () => {
+          showSpeechBubble( teapupGameOver[ getRandomInt( teapupGameOver.length ) ] );
+        }, tpDeathTimer );
+
+        // setTimeout( () => {
+        //   location.reload();
+        // }, 20000 );
       }
 
       function aiCompute( rayVals ) {
@@ -560,29 +579,75 @@
               bossHP--;
               if( bossHP <= 0 ) {
                 // DED BOSS
-                let explosion = Unicorn.AddParticles( "explosion" + counter++, {
-                  shape: "circle", // "cone", "line"
-                  startColor: "#FB8200",
-                  endColor: "#FEBE79",
-                  intensity: 10, // Scale from 1 - 10
-                  minSpeed: 0.1,
-                  maxSpeed: 0.25,
-                  decay: 1, // Scale from 0 - 10
-                }, boss.position.x, boss.position.y );
-                let pieces = Unicorn.AddParticles( "pieces" + counter++, {
-                  shape: "circle", // "cone", "line"
-                  startColor: "#4A4957",
-                  endColor: "#4A4957",
-                  blendMode: PIXI.BLEND_MODES.DARKEN,
-                  intensity: 10, // Scale from 1 - 10
-                  minSpeed: 0.01,
-                  maxSpeed: 0.025,
-                  decay: 1, // Scale from 0 - 10
-                }, boss.position.x, boss.position.y );
+                winGame();
+                let redParticles = Unicorn.AddParticles( "win" + counter++, {
+                    shape: "circle", // "cone", "line"
+                    startColor: 0xe41e26,
+                    endColor: 0xe41e26,
+                    blendMode: PIXI.BLEND_MODES.OVERLAY,
+                    intensity: 10, // Scale from 1 - 10
+                    minSpeed: 0.1,
+                    maxSpeed: 0.25,
+                    decay: 1, // Scale from 0 - 10
+                  }, x, y );
+                let blueParticles = Unicorn.AddParticles( "win" + counter++, {
+                    shape: "circle", // "cone", "line"
+                    startColor: 0x1474bb,
+                    endColor: 0x1474bb,
+                    blendMode: PIXI.BLEND_MODES.OVERLAY,
+                    intensity: 10, // Scale from 1 - 10
+                    minSpeed: 0.1,
+                    maxSpeed: 0.25,
+                    decay: 1, // Scale from 0 - 10
+                  }, x, y );
+                let greenParticles = Unicorn.AddParticles( "win" + counter++, {
+                    shape: "circle", // "cone", "line"
+                    startColor: 0x8fc33e,
+                    endColor: 0x8fc33e,
+                    blendMode: PIXI.BLEND_MODES.OVERLAY,
+                    intensity: 10, // Scale from 1 - 10
+                    minSpeed: 0.1,
+                    maxSpeed: 0.25,
+                    decay: 1, // Scale from 0 - 10
+                  }, x, y );
+                let purpleParticles = Unicorn.AddParticles( "win" + counter++, {
+                    shape: "circle", // "cone", "line"
+                    startColor: 0x5d2b7d,
+                    endColor: 0x5d2b7d,
+                    blendMode: PIXI.BLEND_MODES.OVERLAY,
+                    intensity: 10, // Scale from 1 - 10
+                    minSpeed: 0.1,
+                    maxSpeed: 0.25,
+                    decay: 1, // Scale from 0 - 10
+                  }, x, y );
+                let yellowParticles = Unicorn.AddParticles( "win" + counter++, {
+                    shape: "circle", // "cone", "line"
+                    startColor: 0xfeee22,
+                    endColor: 0xfeee22,
+                    blendMode: PIXI.BLEND_MODES.OVERLAY,
+                    intensity: 10, // Scale from 1 - 10
+                    minSpeed: 0.1,
+                    maxSpeed: 0.25,
+                    decay: 1, // Scale from 0 - 10
+                  }, x, y );
+                let violetParticles = Unicorn.AddParticles( "win" + counter++, {
+                    shape: "circle", // "cone", "line"
+                    startColor: 0xa72d89,
+                    endColor: 0xa72d89,
+                    blendMode: PIXI.BLEND_MODES.OVERLAY,
+                    intensity: 10, // Scale from 1 - 10
+                    minSpeed: 0.1,
+                    maxSpeed: 0.25,
+                    decay: 1, // Scale from 0 - 10
+                  }, x, y );
                 setTimeout( () => {
-                  Unicorn.RemoveParticles( explosion.name );
-                  Unicorn.RemoveParticles( pieces.name );
-                }, 100 );
+                  Unicorn.RemoveParticles( redParticles.name );
+                  Unicorn.RemoveParticles( blueParticles.name );
+                  Unicorn.RemoveParticles( greenParticles.name );
+                  Unicorn.RemoveParticles( purpleParticles.name );
+                  Unicorn.RemoveParticles( yellowParticles.name );
+                  Unicorn.RemoveParticles( violetParticles.name );
+                }, 5000 );
                 Unicorn.RemoveObject( boss.label );
               }
             }
@@ -792,7 +857,7 @@
             voteStar.x = -1000;
             if( power === maxVotes ) {
               console.log( "POWER UP" );
-              firingCount += 2;
+              firingCount += 3;
               tpHP--;
               refreshVisibleHP();
               winningUpgrade = 0;
@@ -908,7 +973,6 @@
             bossHealthBar.x = 540;
             bossHealthBar.y = 260;
             bossHealthBar.transform.scale.x = bossHP / bossMaxHP;
-            /// !!!!!!!
           }
 
           if( isSpawningEnemies ) {
@@ -942,7 +1006,7 @@
               console.log( "WAVE:", waveNumber );
               spawnEnemyWave( ( enemyLevel - 1 ) * 2 + roundNumber );
             }
-            else if( enemies.length <= 0 ) {
+            else if( enemies.length <= 0 && !isBossLevel ) {
               startVote();
             }
           }
@@ -990,6 +1054,20 @@
         if( gameState === "start" ) {
           switch( command ) {
             case "candytime":
+              switch( message.toLowerCase() ) {
+                case "easy":
+                  bossMaxHP = 50;
+                  bossEndLevel = 2;
+                  break;
+                case "hard":
+                  bossMaxHP = 100000;
+                  bossEndLevel = 9;
+                  break;
+                default:
+                  bossMaxHP = 1000;
+                  bossEndLevel = 5;
+                  break;
+              }
               startVote();
               break;
           }
