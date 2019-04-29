@@ -5,6 +5,7 @@ COMPLETED:
 - Waves
 - Voting (!power !speed !heal) - auto-heals when only 1 heart
 - Selected Font: Luckiest Guy
+- Add Particle Effects!
 
 TODO:
 - Wave Count + Enemy Level
@@ -16,8 +17,6 @@ TODO:
    - Warp spawn for the wave to come in
    - HP Bar for enemies
 
-- Add Particle Effects!
-
 - Voting stage interface
    *- !power, !speed, !heal
    *- show cost of each
@@ -26,12 +25,12 @@ TODO:
    - show winning vote and the upgrade applied
 
 - ARTS!!!
-   - Minion Police Robots
+   *- Minion Police Robots
    - Warp Portal for robots
-   - New Pixel Heart + Empty Heart for life bar
-   - Pixel Skittles
+   *- New Pixel Heart + Empty Heart for life bar
+   *- Pixel Skittles
    - Bosses
-   - Title Image (cyberpunk title logo)
+   *- Title Image (cyberpunk title logo)
 
 - Scoreboard for chat
 

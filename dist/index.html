@@ -43,6 +43,7 @@
       var gameState = "vote"; // vote, battle, end
       var counter = 0;
       var tpTrike = null;
+      var tpExhaust = [];
       var tpEmptyHearts = [];
       var tpFullHearts = [];
       const tpMaxHP = 5;
@@ -71,7 +72,7 @@
       var firingCount = 1;
       var fireTime = 0;
       var skittles = [];
-      var voteTime = 10000; // 60000
+      var voteTime = 1000; // 60000
       var voteTimer = 0;
       var votes = {};
 
@@ -197,7 +198,6 @@
           if( rayCast.length > 0 ) {
             var obstacle = rayCast.find( b => !b.body.label.startsWith( "skittle" ) );
             if( obstacle ) {
-              console.log( obstacle );
               rayLength = obstacle.depth;
             }
           }
@@ -231,21 +231,59 @@
         var sY = tpTrike.position.y + dirY * 60;
         var bulletX = Math.cos( tpAimAngle + Math.random() * -0.005 + 0.0005 );
         var bulletY = Math.sin( tpAimAngle + Math.random() * -0.005 + 0.0005 );
+        var color = getRandomInt( 6 );
+        var sprite = "skittleBlue";
+        switch( color ) {
+          case 0:
+            color = 0x1474bb;
+            sprite = "skittleBlue";
+            break;
+          case 1:
+            color = 0xe41e26;
+            sprite = "skittleRed";
+            break;
+          case 2:
+            color = 0x8fc33e;
+            sprite = "skittleGreen";
+            break;
+          case 3:
+            color = 0x5d2b7d;
+            sprite = "skittlePurple";
+            break;
+          case 4:
+            color = 0xfeee22;
+            sprite = "skittleYellow";
+            break;
+          case 5:
+            color = 0xa72d89;
+            sprite = "skittleViolet";
+            break;
+        }
         var skittle = Unicorn.AddObject( "skittle" + counter++, {
               type: "circle",
               x: sX, y: sY,
               radius: 8,
-              // sprite: "unicorn",
+              sprite: sprite,
               bounce: 0,
             } );
         skittle.force.x = bulletX * 0.01;
         skittle.force.y = bulletY * 0.01;
         skittle.life = 500;
+        skittle.color = color;
         skittles.push( skittle );
       }
 
       function spawnTeapup( x, y, health ) {
         tpHP = health;
+        tpExhaust.push( Unicorn.AddOverlay( "exhaustRed", "exhaustRed", x, y ) );
+        tpExhaust.push( Unicorn.AddOverlay( "exhaustBlue", "exhaustBlue", x, y ) );
+        tpExhaust.push( Unicorn.AddOverlay( "exhaustYellow", "exhaustYellow", x, y ) );
+        tpExhaust.push( Unicorn.AddOverlay( "exhaustViolet", "exhaustViolet", x, y ) );
+        tpExhaust.push( Unicorn.AddOverlay( "exhaustGreen", "exhaustGreen", x, y ) );
+        tpExhaust.push( Unicorn.AddOverlay( "exhaustPurple", "exhaustPurple", x, y ) );
+        tpExhaust.forEach( e => {
+          e.anchor.set( 0.5 );
+        });
         tpTrike = Unicorn.AddObject( "tricycle", {
           type: "circle",
           x, y,
@@ -286,7 +324,19 @@
             // Check for bullets!
             if( label.startsWith( "skittle" ) ) {
               // KABOOM
-              // TODO: Particles!
+              let candyPieces = Unicorn.AddParticles( "candy" + counter++, {
+                  shape: "circle", // "cone", "line"
+                  startColor: body.color,
+                  endColor: body.color,
+                  blendMode: PIXI.BLEND_MODES.OVERLAY,
+                  intensity: 10, // Scale from 1 - 10
+                  minSpeed: 0.1,
+                  maxSpeed: 0.25,
+                  decay: 1, // Scale from 0 - 10
+                }, body.position.x, body.position.y );
+              setTimeout( () => {
+                  Unicorn.RemoveParticles( candyPieces.name );
+                }, 100 );
               // console.log( body );
               // Remove Skittle
               var skittleIndex = skittles.findIndex( s => s.label === label );
@@ -297,6 +347,29 @@
               enemy.health--;
               if( enemy.health <= 0 ) {
                 // DED ENEMY
+                let explosion = Unicorn.AddParticles( "explosion" + counter++, {
+                  shape: "circle", // "cone", "line"
+                  startColor: "#FB8200",
+                  endColor: "#FEBE79",
+                  intensity: 10, // Scale from 1 - 10
+                  minSpeed: 0.1,
+                  maxSpeed: 0.25,
+                  decay: 1, // Scale from 0 - 10
+                }, enemy.position.x, enemy.position.y );
+                let pieces = Unicorn.AddParticles( "pieces" + counter++, {
+                  shape: "circle", // "cone", "line"
+                  startColor: "#4A4957",
+                  endColor: "#4A4957",
+                  blendMode: PIXI.BLEND_MODES.DARKEN,
+                  intensity: 10, // Scale from 1 - 10
+                  minSpeed: 0.01,
+                  maxSpeed: 0.025,
+                  decay: 1, // Scale from 0 - 10
+                }, enemy.position.x, enemy.position.y );
+                setTimeout( () => {
+                  Unicorn.RemoveParticles( explosion.name );
+                  Unicorn.RemoveParticles( pieces.name );
+                }, 100 );
                 enemies.splice( enemies.indexOf( enemy ), 1 );
                 Unicorn.RemoveObject( enemy.label );
               }
@@ -334,6 +407,18 @@
         // Add Initialization Here
         Unicorn.Load( "heart_empty", "assets/heartEmpty.png" );
         Unicorn.Load( "heart_full", "assets/heartFull.png" );
+        Unicorn.Load( "skittleBlue", "assets/skittleBlue.png" );
+        Unicorn.Load( "skittleGreen", "assets/skittleGreen.png" );
+        Unicorn.Load( "skittlePurple", "assets/skittlePurple.png" );
+        Unicorn.Load( "skittleRed", "assets/skittleRed.png" );
+        Unicorn.Load( "skittleViolet", "assets/skittleViolet.png" );
+        Unicorn.Load( "skittleYellow", "assets/skittleYellow.png" );
+        Unicorn.Load( "exhaustBlue", "assets/exhaustBlue.png" );
+        Unicorn.Load( "exhaustGreen", "assets/exhaustGreen.png" );
+        Unicorn.Load( "exhaustPurple", "assets/exhaustPurple.png" );
+        Unicorn.Load( "exhaustRed", "assets/exhaustRed.png" );
+        Unicorn.Load( "exhaustViolet", "assets/exhaustViolet.png" );
+        Unicorn.Load( "exhaustYellow", "assets/exhaustYellow.png" );
         Unicorn.Load( "robot", "assets/robot.png" );
         Unicorn.Load( "tricycle", "assets/teapupTrike.png" );
         Unicorn.Load( "teapup", "assets/teapup.png" );
@@ -396,17 +481,6 @@
         // }, ( label, body ) => {
         //   console.log( "Exit:", label, body );
         // } );
-        // Unicorn.AddParticles( "fireworks", {
-        //   shape: "circle", // "cone", "line"
-        //   // startColor: "#88ff00",
-        //   // endColor: "#ff0088",
-        //   startColor: "#FB8200",
-        //   endColor: "#FEBE79",
-        //   intensity: 10, // Scale from 1 - 10
-        //   minSpeed: 0.1,
-        //   maxSpeed: 0.25,
-        //   decay: 1, // Scale from 0 - 10
-        // }, 100, 100);
       }
 
       function Update( timestamp, timeDiffInMs ) {
@@ -424,6 +498,15 @@
         }
         tpImage.x = tpTrike.position.x;
         tpImage.y = tpTrike.position.y;
+        var dirX = Math.cos( tpTrike.angle );
+        var dirY = Math.sin( tpTrike.angle );
+        tpExhaust.forEach( ( e, i ) => {
+          e.transform.rotation = tpTrike.angle;
+          e.transform.scale.x = 0.5 + Math.sin( timestamp / 1000 * 20 + i * 5 ) * 0.1;
+          e.transform.scale.y = 0.5 + Math.cos( timestamp / 1000 * 20 + i * 10 ) * 0.05;
+          e.x = tpTrike.position.x - dirX * 50;
+          e.y = tpTrike.position.y - dirY * 50;
+        });
 
         voteText.visible = false;
 
@@ -544,16 +627,22 @@
           tpVote[ 1 ].visible = false;
           if( shieldTimer > 0 ) {
             shieldTimer -= timeDiffInMs;
+            tpImage.alpha = 0.75 + Math.sin( timestamp / 100 ) * 0.5;
+            tpImage.tint = lerpColor( 0xff0000, 0xffffff, Math.min( tpImage.alpha, 1 ) );
+          }
+          else {
+            tpImage.alpha = 1;
+            tpImage.tint = 0xffffff;
           }
 
           // Spawn enemies when the current wave is defeated
           if( enemies.length <= 0 ) {
             waveNumber++;
-            console.log( "WAVE:", waveNumber );
             if( waveNumber > waveCount ) {
               startVote();
             }
             else {
+              console.log( "WAVE:", waveNumber );
               spawnEnemyWave( 1 + enemyLevel * 2 );
             }
           }
@@ -643,7 +732,7 @@
         Unicorn.Create( "unicorn-display", {
           width: 1280,
           height: 720,
-          background: 0xaaaaaa,// "transparent",
+          background: 0x777777,// "transparent",
           // background: "transparent",
           init: Init,
           update: Update,
