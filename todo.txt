@@ -21,7 +21,7 @@ TODO:
    - "More Candy Police in..." (countdown)
    - Candy Police Alert! weeeoooooweeeoooo
    - "BOSS ALERT"
-   - Warp spawn for the wave to come in
+   *- Warp spawn for the wave to come in
    - HP Bar for enemies
 
 - ARTS!!!
