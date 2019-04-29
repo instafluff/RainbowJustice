@@ -26,7 +26,7 @@ TODO:
 
 - ARTS!!!
    *- Minion Police Robots
-   - Warp Portal for robots
+   *- Warp Portal for robots
    *- New Pixel Heart + Empty Heart for life bar
    *- Pixel Skittles
    - Bosses
