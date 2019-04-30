@@ -25,7 +25,7 @@ We built this Twitch-integrated Overlay game live on Twitch for Ludum Dare 44!
 
 Thank you to all those who helped brainstorm and prototype the first version on Day 1!
 
-**Sorry, I couldn't save the list for Day 1**
+**Sorry, I couldn't save the list for Day 1...**
 
 Thank you to everyone who helped work on and improve the revised prototype into the actual game on Day 2!
 
