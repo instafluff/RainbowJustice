@@ -40,17 +40,24 @@
         "Taste this rainbow cannon's fury!",
         "Eat colors and weep!",
         "Enjoy my cavity canon!",
-        "Do I still seem sweet to you, pupper?",
+        "Do I still seem sweet to you?",
         "Someone call Dr. Bazooka Joe",
         "Trick or Treat!",
         "I'M THE SWEETEST!",
-        "SUGAR ME TIMBERS!"
+        "SUGAR ME TIMBERS!",
+        "MyRainbowBringsAllDaDogsToTheYard~",
       ];
       var teapupIntro = [
         "so this is Sugar-Free HQ...",
         "they can't ban Halloween forever.",
         "NOT IF I CAN HELP IT",
         "!candytime to Begin!"
+      ];
+      var teapupWin = [
+        "YAAAAAAAAAAAAAAAAAAAAAS!",
+        "I am the Hallowqueen!",
+        "thanks to the following people",
+        "for making me a STAR!",
       ];
       var teapupGameOver = [
         "ouch",
@@ -61,8 +68,13 @@
         "RAWRRRR",
         "AHHHHHHHHHHHHHHHHH"
       ];
+      var credits = [ "Instafluff", "ElysiaGriffin", "2Danno", "8bitHug", "Adariousmist", "AgroKragle", "Amarogine", "AntiViGames", "Aries41745", "Astrobinary", "BanzaiBaby", "Betha", "BigZach", "Bjwhite211", "Bloom_jiminy", "BlueJellyCam", "BountyHunterLani", "BrainoidGames", "Breci", "BungalowGlow", "BunkaHi", "Bustopher", "CearkaLarue", "Chibigirl24", "CodebaseAlpha", "CreativeBuilds", "CyberNinjaGaming_UK", "DEAD_P1XL", "Dangalicious", "DannyKampsGamez", "DevMerlin", "DevonGH", "Dexqyen", "Docpinecone", "Doubaltsey", "DrJavaSaurus", "Dsplits", "DutchGamer46", "ELgnad", "Easymacman", "Ella_Fint", "EndlessMoonfall", "EndlessSonrise", "Everything_is_awes0me", "EvilCanadian", "FBail", "Fisune", "Flippo13", "FranC312", "FuriousFur", "GameDevCompany", "Gamezdad", "Gilokk0", "Glenn___", "Gorogokvi", "GrimAquatic", "Grognardian", "HeyOhKei", "HonestDanGames", "Im_Kritz", "Instafluff", "Instafriend", "InstantlyFire", "JMSWRNR", "JaiTekk", "JenniNexus", "JoeShimHae", "Jormunduur", "Joshelisk", "Jwh1o1", "K1ng440", "Kara_Kim", "Khaled__", "KitAnnLIVE", "Krakka25", "Kushimitama", "Kyoslilmonster", "Lahtnaa", "LiliaHarlow", "LilyHazel", "Little_Bungorf", "LordOverflow", "Lord_of_Conquest", "LuRiMer313", "LuckyPheathers", "M4Mons", "MacabreMan2", "MalForTheWin", "Maladath1980", "MangoMaestro", "MartianGames", "McKleaver", "MerlinLeWizard", "Miraellyn", "Moopaloo", "MrRayKoma", "MsSaltyGiggles", "MudBocx", "Neo_TA", "NinjaFalcon_2", "NoiceNToight", "NotDenaerys", "Nrwgn_VKNG", "Optik_Nerve", "PlatYellow", "RIKACHET", "Raevin10", "Ralnorin", "RikuRinku", "Rivverdragon", "RocknightStudios", "Samthe718manlol", "SausageCam", "ScrtSolstice", "Shaggz13", "SoftshellTCCT", "SpikeTiger", "Starlet_Blossom", "Succatash", "Supascury", "SushiDay", "Talk2meGooseman", "That_MS_Gamer", "TheBardVyune", "TheHugoDahl", "TheRealArman", "TheSandwichKitsune", "TheSpiceWizard", "TheVividLotus", "Theoneandonlybigbadmo", "ThiccMercs_", "Toomuchcoffe", "Typhoon22288", "Uberblacktorne", "UncleStinky3921", "WhatTheStuck", "WolvesGamingDen", "Xaiydee", "Xolti", "XxPhantasmaxX", "ZallixSilver", "ZobStan", "ZpeedTube", "aj2017", "arnab345madd", "baileydale", "blakeparsons12", "born_to_be_smart", "brandan_f", "bscolaro", "carlosdlroca", "cartufer", "cengo5x7", "codephobia", "cottonsmiles", "danielbrown864", "darkblaze176", "dcj44", "donaldwm", "duartubetv", "etisdew", "feliiax", "fpicoitoj", "fydo", "gabrielgabu", "gamemodeon232", "gamezmom", "genos3", "guppygirl777", "guthron", "heysatou", "holloway87", "infectious_karma", "itsuNu", "jellydance", "juan_cena_rl", "julieee22", "kittybubbly026", "koralina211", "llofyy", "losthewar", "malfunct", "marcmagus", "marss112", "miniaturegard3n", "mmtaleghani", "mrbinary001", "n1k1cha_pff", "nick_larsen", "nightsilas", "not_a_n1nja", "oldrop", "oliveriib", "pawsitivelystitched", "peterf28", "pujolsluis", "puppymaister", "robowarrior1982", "rockysenpai24", "roidz999", "saoigames", "shadowcraft5", "simrose4u", "smilesandtea", "sokanuchan", "songfox", "sorskoot", "sparky_pugwash", "spartaremix1", "stresstest", "superjesse07", "theMichaelJolley", "thegooseofwild", "thomasnhermansen", "tiger_k1ng", "trufflette", "くコ彡" ];
 
       var gameState = "start"; // start, vote, battle, end, win
+      var titleWin;
+      var titleTimer = 0;
+      var winText = -1;
+      var winTextTimer = 0;
       var introText = -1;
       var introTextTimer = 1000;
       var counter = 0;
@@ -135,6 +147,7 @@
           if( enemyLevel >= bossEndLevel ) {
             // FINAL BOSS
             startBattle();
+            tpHP = tpMaxHP; // Heal Teapup to full
             spawnCaptain( 640, 360, bossMaxHP );
           }
         }
@@ -180,20 +193,19 @@
 
       function winGame() {
         gameState = "win";
-        tpTrike.isStatic = true;
         tpImage.alpha = 1;
         tpImage.tint = 0xffffff;
-        tpDeathTimer = 1500;
         enemies.forEach( x => x.isStatic = true );
         bossHealthBarContainer.x = -1000;
         bossHealthBar.x = -1000;
+        // Show "ahh" cat
+        bosscat[ 1 ].x = 640;
+        bosscat[ 1 ].y = 360;
+        bosscat[ 0 ].x = -1000;
         setTimeout( () => {
-          showSpeechBubble( teapupGameOver[ getRandomInt( teapupGameOver.length ) ] );
-        }, tpDeathTimer );
-
-        // setTimeout( () => {
-        //   location.reload();
-        // }, 20000 );
+          titleTimer = 1000;
+        }, 4000 );
+        winTextTimer = 10;
       }
 
       function aiCompute( rayVals ) {
@@ -686,6 +698,8 @@
         bosscat.forEach( b => b.anchor.set( 0.5 ) );
         bossHealthBarContainer = Unicorn.AddOverlay( "healthBarContainer", "healthBarContainer", -1000, 0 );
         bossHealthBar = Unicorn.AddOverlay( "healthBar", "healthBar", -1000, 0 );
+        titleWin = Unicorn.AddOverlay( "titleWin", "titleWin", -1000, 0 );
+        titleWin.anchor.set( 0.5 );
         spawnTeapup( 640, 360, tpMaxHP );
         voteStar = Unicorn.AddOverlay( "star", "star", -1000, -1000 );
         tpVote.push( Unicorn.AddOverlay( "voteL", "voteL", -1000, -1000 ) );
@@ -784,6 +798,38 @@
 
           driveTeapup( timeDiffInMs );
           aimTeapup( timeDiffInMs );
+        }
+
+        if( gameState === "win" ) {
+          if( titleTimer > 0 ) {
+            titleTimer -= timeDiffInMs;
+            titleWin.x = 640;
+            titleWin.y = -500 + ( 1 - titleTimer / 1000 ) * 860;
+            if( titleTimer < 0 ) {
+              titleWin.y = 360;
+            }
+          }
+
+          if( winTextTimer > 0 ) {
+            winTextTimer -= timeDiffInMs;
+            if( winTextTimer <= 0 ) {
+              winText++;
+              if( winText < teapupWin.length ) {
+                showSpeechBubble( teapupWin[ winText ] );
+                winTextTimer = 4000;
+              }
+              else if( winText - teapupWin.length < credits.length ) {
+                showSpeechBubble( credits[ winText - teapupWin.length ] );
+                winTextTimer = 4000;
+              }
+              else {
+                winTextTimer = 0;
+                setTimeout( () => {
+                  location.reload();
+                }, 5000 );
+              }
+            }
+          }
         }
 
         if( gameState === "vote" ) {
@@ -1144,6 +1190,7 @@
         Unicorn.Load( "bosscat2", "assets/catastrophe2.png" );
         Unicorn.Load( "healthBar", "assets/healthBarFull.png" );
         Unicorn.Load( "healthBarContainer", "assets/healthBarEmpty.png" );
+        Unicorn.Load( "titleWin", "assets/TitleWin.png" );
       }
 
       function OnChatMessage( user, message, flags, self ) {
