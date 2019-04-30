@@ -1,9 +1,31 @@
-# RainbowJustice
-Teapup Game for Ludum Dare 44
+# Rainbow Rampage - A Twitch-Chat Overlay Game
+
+**_In the near future, Halloween has been banned. Professor Fluffington has recruited secret agent Teapup to infiltrate Sugar-Free Headquarters and skittle her way to the top and save the greatest candy holiday from oblivion. Will you help her with her mission?_**
+
+Type **!candytime** to start the game and then each round, vote to use life to upgrade or to restore life by typing **!power, !speed, or !heal**. Good luck!
+
+## Setup Instructions for the streamer
+Replace the **_[yourchannel]_** part of the URL with the name of your Twitch channel and then add the following URL as a Browser Source into OBS or XSplit:
+`https://www.instafluff.tv/RainbowRampage/dist?channel=[yourchannel]&overlay=true`
+
+The **_width_** and **_height_** of the Browser Source should be **_1280_** and **_720_**
+
+You can also play on a web browser by removing **_&overlay=true_**
+
+
+## Instafluff ##
+
+We built this Twitch-integrated Overlay game live on Twitch for Ludum Dare 44!
+
+> *Come and hang out with us at the Comfiest Corner on Twitch!*
+
+> https://twitch.tv/instafluff
+
+> https://twitter.com/instafluffTV
 
 Thank you to all those who helped brainstorm and prototype the first version on Day 1!
 
-**[Need List!]**
+**Sorry, I couldn't save the list for Day 1**
 
 Thank you to everyone who helped work on and improve the revised prototype into the actual game on Day 2!
 
