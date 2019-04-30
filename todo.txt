@@ -15,6 +15,7 @@ COMPLETED:
 - Adjust voting star position
 - Update the voting to show heal for 3 hearts
 - Intro
+- Game Win
 
 TODO:
 
@@ -33,9 +34,9 @@ TODO:
    *- Warp Portal for robots
    *- New Pixel Heart + Empty Heart for life bar
    *- Pixel Skittles
-   - Bosses
+   *- Bosses
    *- Title Image (cyberpunk title logo)
-   - Game Over Image
+   *- Game Over Image
 
 - SOUND FX!
    - Skittle Gun Sound

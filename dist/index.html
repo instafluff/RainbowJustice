@@ -8,6 +8,7 @@
   <body>
     <div id="unicorn-display"></div>
     <script>
+      const params = new URLSearchParams(location.search);
       window.WebFontConfig = {
           google: {
               families: ['Luckiest Guy', 'Geo'],
@@ -46,6 +47,11 @@
         "I'M THE SWEETEST!",
         "SUGAR ME TIMBERS!",
         "MyRainbowBringsAllDaDogsToTheYard~",
+      ];
+      var teapupHelp = [
+        "Please specify a Twitch channel",
+        "You can see how at instafluff.tv",
+        "www.instafluff.tv/RainbowRampage"
       ];
       var teapupIntro = [
         "so this is Sugar-Free HQ...",
@@ -788,11 +794,20 @@
             introTextTimer -= timeDiffInMs;
             if( introTextTimer <= 0 ) {
               introText++;
-              if( introText >= teapupIntro.length ) {
-                introText = teapupIntro.length - 1;
+              if( params.get( "channel" ) ) {
+                if( introText >= teapupIntro.length ) {
+                  introText = teapupIntro.length - 1;
+                }
+                showSpeechBubble( teapupIntro[ introText ] );
+                introTextTimer = 5000;
               }
-              showSpeechBubble( teapupIntro[ introText ] );
-              introTextTimer = 5000;
+              else {
+                if( introText >= teapupHelp.length ) {
+                  introText = teapupHelp.length - 1;
+                }
+                showSpeechBubble( teapupHelp[ introText ] );
+                introTextTimer = 5000;
+              }
             }
           }
 
@@ -1209,11 +1224,11 @@
         Unicorn.Create( "unicorn-display", {
           width: 1280,
           height: 720,
-          background: 0x777777,// "transparent",
+          background: params.get( "overlay" ) ? "transparent" : 0x777777,
           // background: "transparent",
           init: Init,
           update: Update,
-          channel: "instafriend",
+          channel: params.get( "channel" ),
           onCommand: OnChatCommand,
           onChat: OnChatMessage,
           // screenWalls: false, // Default: true
