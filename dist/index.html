@@ -951,40 +951,50 @@
           }
         }
         else {
+          var scaleY = 1, offsetY = 0, offsetTextY = 0;
+          if( tpTrike.position.y < 200 ) {
+            scaleY = -1;
+            offsetY = 280;
+            offsetTextY = -113;
+          }
           if( isSpeechBubbleShowing ) {
             var textIndex = isLongSpeechText ? 2 : 0;
             var textOffset = isLongSpeechText ? 80 : 0;
             speechBubbles.forEach( s => s.visible = false );
             if( isLongSpeechText ) {
               if( tpTrike.position.x < 500 ) {
+                speechBubbles[ textIndex + 1 ].scale.y = scaleY;
                 speechBubbles[ textIndex + 1 ].visible = true;
                 speechBubbles[ textIndex + 1 ].x = tpImage.x + 30;
-                speechBubbles[ textIndex + 1 ].y = tpImage.y - 120;
+                speechBubbles[ textIndex + 1 ].y = tpImage.y - 120 + offsetY;
                 speechBubbleText.x = speechBubbles[ textIndex + 1 ].x + textOffset + 120;
-                speechBubbleText.y = speechBubbles[ textIndex + 1 ].y + 55;
+                speechBubbleText.y = speechBubbles[ textIndex + 1 ].y + 55 + offsetTextY;
               }
               else {
+                speechBubbles[ textIndex + 0 ].scale.y = scaleY;
                 speechBubbles[ textIndex + 0 ].visible = true;
                 speechBubbles[ textIndex + 0 ].x = tpImage.x - 440;
-                speechBubbles[ textIndex + 0 ].y = tpImage.y - 140;
+                speechBubbles[ textIndex + 0 ].y = tpImage.y - 140 + offsetY;
                 speechBubbleText.x = speechBubbles[ textIndex + 0 ].x + textOffset + 120;
-                speechBubbleText.y = speechBubbles[ textIndex + 0 ].y + 55;
+                speechBubbleText.y = speechBubbles[ textIndex + 0 ].y + 55 + offsetTextY;
               }
             }
             else {
               if( tpTrike.position.x < 300 ) {
+                speechBubbles[ textIndex + 1 ].scale.y = scaleY;
                 speechBubbles[ textIndex + 1 ].visible = true;
                 speechBubbles[ textIndex + 1 ].x = tpImage.x + 30;
-                speechBubbles[ textIndex + 1 ].y = tpImage.y - 120;
+                speechBubbles[ textIndex + 1 ].y = tpImage.y - 120 + offsetY;
                 speechBubbleText.x = speechBubbles[ textIndex + 1 ].x + textOffset + 120;
-                speechBubbleText.y = speechBubbles[ textIndex + 1 ].y + 55;
+                speechBubbleText.y = speechBubbles[ textIndex + 1 ].y + 55 + offsetTextY;
               }
               else {
+                speechBubbles[ textIndex + 0 ].scale.y = scaleY;
                 speechBubbles[ textIndex + 0 ].visible = true;
                 speechBubbles[ textIndex + 0 ].x = tpImage.x - 300;
-                speechBubbles[ textIndex + 0 ].y = tpImage.y - 140;
+                speechBubbles[ textIndex + 0 ].y = tpImage.y - 140 + offsetY;
                 speechBubbleText.x = speechBubbles[ textIndex + 0 ].x + textOffset + 120;
-                speechBubbleText.y = speechBubbles[ textIndex + 0 ].y + 55;
+                speechBubbleText.y = speechBubbles[ textIndex + 0 ].y + 55 + offsetTextY;
               }
             }
           }
@@ -1149,22 +1159,6 @@
                 voteTimer = 100;
               }
               break;
-          }
-        }
-        else {
-          if( command === "say" ) {
-            showSpeechBubble( message );
-          }
-        }
-
-        if( command === "pupgrade" ) {
-          if( tpHP > 1 ) {
-            tpHP--;
-            refreshVisibleHP();
-            // hpText.text = tpHP;
-            firingRate *= 0.75;
-            firingCount++;
-            tpSpeed++;
           }
         }
       }
