@@ -748,10 +748,12 @@
         titleWin = Unicorn.AddOverlay( "titleWin", "titleWin", -1000, 0 );
         titleWin.anchor.set( 0.5 );
         spawnTeapup( 640, 360, tpMaxHP );
-        voteStar = Unicorn.AddOverlay( "star", "star", -1000, -1000 );
         tpVote.push( Unicorn.AddOverlay( "voteL", "voteL", -1000, -1000 ) );
         tpVote.push( Unicorn.AddOverlay( "voteR", "voteR", -1000, -1000 ) );
+        tpVote.push( Unicorn.AddOverlay( "voteL2", "voteL2", -1000, -1000 ) );
+        tpVote.push( Unicorn.AddOverlay( "voteR2", "voteR2", -1000, -1000 ) );
         tpVote.forEach( x => x.visible = false );
+        voteStar = Unicorn.AddOverlay( "star", "star", -1000, -1000 );
         voteText = Unicorn.AddText( "bubbleText", "!power   !heal   !speed", 120, 35, {
           fontFamily: "Geo",
           fontSize: 24,
@@ -908,25 +910,31 @@
           var maxVotes = Math.max( power, Math.max( speed, heal ) );
 
           voteText.visible = true;
+          var offsetY = 0, offsetTextY = 0;
+          var textIndex = 0;
+          if( tpTrike.position.y < 200 ) {
+            offsetY = 160;
+            offsetTextY = 8;
+            textIndex = 2;
+          }
+          tpVote.forEach( s => s.visible = false );
           if( tpTrike.position.x < 300 ) {
-            tpVote[ 0 ].visible = false;
-            tpVote[ 1 ].visible = true;
-            tpVote[ 1 ].x = tpTrike.position.x + 30;
-            tpVote[ 1 ].y = tpTrike.position.y - 120;
-            voteText.x = tpVote[ 1 ].x + 120;
-            voteText.y = tpVote[ 1 ].y + 40;
-            voteTimeBar.x = tpVote[ 1 ].x + 10;
-            voteTimeBar.y = tpVote[ 1 ].y + 79;
+            tpVote[ textIndex + 1 ].visible = true;
+            tpVote[ textIndex + 1 ].x = tpTrike.position.x + 30;
+            tpVote[ textIndex + 1 ].y = tpTrike.position.y - 120 + offsetY;
+            voteText.x = tpVote[ textIndex + 1 ].x + 120;
+            voteText.y = tpVote[ textIndex + 1 ].y + 40 + offsetTextY;
+            voteTimeBar.x = tpVote[ textIndex + 1 ].x + 10;
+            voteTimeBar.y = tpVote[ textIndex + 1 ].y + 79 + offsetTextY;
           }
           else {
-            tpVote[ 1 ].visible = false;
-            tpVote[ 0 ].visible = true;
-            tpVote[ 0 ].x = tpTrike.position.x - 300;
-            tpVote[ 0 ].y = tpTrike.position.y - 140;
-            voteText.x = tpVote[ 0 ].x + 120;
-            voteText.y = tpVote[ 0 ].y + 40;
-            voteTimeBar.x = tpVote[ 0 ].x + 9;
-            voteTimeBar.y = tpVote[ 0 ].y + 79;
+            tpVote[ textIndex + 0 ].visible = true;
+            tpVote[ textIndex + 0 ].x = tpTrike.position.x - 300;
+            tpVote[ textIndex + 0 ].y = tpTrike.position.y - 140 + offsetY;
+            voteText.x = tpVote[ textIndex + 0 ].x + 120;
+            voteText.y = tpVote[ textIndex + 0 ].y + 40 + offsetTextY;
+            voteTimeBar.x = tpVote[ textIndex + 0 ].x + 9;
+            voteTimeBar.y = tpVote[ textIndex + 0 ].y + 79 + offsetTextY;
           }
           if( power === maxVotes ) {
             voteStar.x = voteText.x - 83;
@@ -1041,8 +1049,7 @@
         }
 
         if( gameState === "battle" ) {
-          tpVote[ 0 ].visible = false;
-          tpVote[ 1 ].visible = false;
+          tpVote.forEach( x => x.visible = false );
           if( shieldTimer > 0 ) {
             shieldTimer -= timeDiffInMs;
             tpTrike.sprite.alpha = tpImage.alpha = 0.75 + Math.sin( timestamp / 100 ) * 0.5;
@@ -1231,6 +1238,8 @@
         Unicorn.Load( "star", "assets/star.png" );
         Unicorn.Load( "voteL", "assets/voteBubbleL.png" );
         Unicorn.Load( "voteR", "assets/voteBubbleR.png" );
+        Unicorn.Load( "voteL2", "assets/voteBubbleL2.png" );
+        Unicorn.Load( "voteR2", "assets/voteBubbleR2.png" );
         Unicorn.Load( "speechL", "assets/speechBubbleL.png" );
         Unicorn.Load( "speechR", "assets/speechBubbleR.png" );
         Unicorn.Load( "speechLongL", "assets/speechBubbleLongL.png" );
