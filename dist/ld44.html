@@ -286,72 +286,32 @@
         tpImage.transform.rotation = tpAimAngle;
       }
 
-      function simulateWorld( targetX, targetY, objects,  timeDiff ) {
-        return objects.map( a => {
-          var dX = targetX - a.x, dY = targetY - a.y;
-          var length = Math.sqrt( dX * dX + dY * dY );
-          return { x: a.x + dX / length * a.speed * timeDiff, y: a.y + dY / length * a.speed * timeDiff, speed: a.speed }
-          } );
-      }
-
-      function scoreWorld( pX, pY, objects ) {
-        var totalScore = 0;
-        // Check walls
-        if( pX <= 120 ) {
-          totalScore -= 120 - pX;
-        }
-        if( pX >= 1280 - 120 ) {
-          totalScore -= pX - ( 1280 - 120 - 120 );
-        }
-        if( pY <= 120 ) {
-          totalScore -= 120 - pY;
-        }
-        if( pY >= 720 - 120 ) {
-          totalScore -= pY - ( 720 - 120 - 120 );
-        }
-        if( isBossLevel ) {
-          var dX = 640 - pX, dY = 360 - pY;
-          var dist2 = dX * dX + dY * dY;
-          if( dist2 < 280 * 280 ) {
-            totalScore -= 280 - Math.sqrt( dist2 );
-          }
-        }
-        objects.forEach( o => {
-          var dX = o.x - pX, dY = o.y - pY;
-          var dist2 = dX * dX + dY * dY;
-          if( dist2 < 260 * 260 ) { // 200 px away from teapup
-            totalScore -= 260 - Math.sqrt( dist2 );
-          }
-        });
-        return totalScore;
-      }
-
-      function scoreAndSimTeapup( turnAngle, objects, timeStep ) {
-        var nextX = tpImage.x + tpSpeed * Math.cos( tpAngle + turnAngle );
-        var nextY = tpImage.y + tpSpeed * Math.sin( tpAngle + turnAngle );
-        var world = simulateWorld( nextY, nextY, objects, timeStep );
-        var score = scoreWorld( nextX, nextY, world );
-        return score;
-      }
-
       function driveTeapup( timeDiff ) {
-        var current = enemies.map( e => ({ x: e.position.x, y: e.position.y, speed: e.moveSpeed }) );
-        // Calculate a score for left, straight, right
-        var currentScore = scoreWorld( tpImage.x, tpImage.y, current );
-        const timeStep = 100;
-        var left = scoreAndSimTeapup( -30 * ( 2 * Math.PI / 360 ) * timeStep / 1000 * 4, current, timeStep );
-        var right = scoreAndSimTeapup( 30 * ( 2 * Math.PI / 360 ) * timeStep / 1000 * 4, current, timeStep );
-        var front = scoreAndSimTeapup( 0, current, timeStep );
-        var maxScore = Math.max( left, Math.max( right, front ) );
-        var turnAngle = 0;
-        if( maxScore === front ) {
-          turnAngle = 0;
+        var rayVals = [];
+        var numCasts = 51;
+        for( var i = 0; i < numCasts; i++ ) {
+          var factor = i / ( numCasts - 1 );
+          var mid = ( numCasts - 1 ) / 2;
+          var change = ( mid - Math.abs( i - mid ) ) / mid;
+          var dirX = Math.cos( tpAngle - Math.PI /2 + Math.PI * factor );
+          var dirY = Math.sin( tpAngle - Math.PI /2 + Math.PI * factor );
+          var rayLength = 120 * change + 70;
+          var rayCast = Unicorn.Raycast( { x: tpTrike.position.x + dirX * 60, y: tpTrike.position.y + dirY * 60 }, { x: tpTrike.position.x + dirX * rayLength, y: tpTrike.position.y + dirY * rayLength } );
+          if( rayCast.length > 0 ) {
+            var obstacle = rayCast.find( b => !b.body.label.startsWith( "skittle" ) );
+            if( obstacle ) {
+              rayLength = obstacle.depth;
+            }
+          }
+          rayVals.push( rayLength );
         }
-        else if( maxScore === right ) {
-          turnAngle = 30 * timeDiff / 1000 * 4;
+        var turnAngle = aiCompute( rayVals ) * timeDiff / 1000;
+        const maxAngle = 30;
+        if( turnAngle < -maxAngle ) {
+          turnAngle = -maxAngle;
         }
-        else {
-          turnAngle = -30 * timeDiff / 1000 * 4;
+        else if( turnAngle > maxAngle ) {
+          turnAngle = maxAngle;
         }
         // console.log( tpTrike.angle + " + " + turnAngle * ( 2 * Math.PI / 360 ) );
         tpAngle += turnAngle * ( 2 * Math.PI / 360 );
@@ -1068,7 +1028,7 @@
             bossTimer -= timeDiffInMs;
             if( bossTimer < 0 ) {
               bossTimer = 10000;
-              spawnEnemyWave( Math.floor( bossEndLevel * 1.5 ) );
+              spawnEnemyWave( 1 );
             }
             if( Math.floor( timestamp / 1000 ) % 2 == 0 ) {
               bosscat[ 0 ].x = 640;
@@ -1168,11 +1128,11 @@
             case "candytime":
               switch( message.toLowerCase() ) {
                 case "easy":
-                  bossMaxHP = 100;
+                  bossMaxHP = 50;
                   bossEndLevel = 2;
                   break;
                 case "hard":
-                  bossMaxHP = 5000;
+                  bossMaxHP = 100000;
                   bossEndLevel = 9;
                   break;
                 default:
