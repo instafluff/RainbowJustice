@@ -170,7 +170,6 @@
         if( text.length >= 35 ) {
           text = text.slice( 0, 33 ) + "..";
         }
-        speechBubbleText.visible = true;
         setTimeout( () => {
           isSpeechBubbleShowing = false;
           speechBubbleText.visible = false;
@@ -181,6 +180,8 @@
 
       function startBattle() {
         gameState = "battle";
+        voteText.visible = false;
+        speechBubbleText.visible = false;
       }
 
       function endGame() {
@@ -1008,6 +1009,7 @@
           if( isSpeechBubbleShowing ) {
             var textIndex = isLongSpeechText ? 2 : 0;
             var textOffset = isLongSpeechText ? 80 : 0;
+            speechBubbleText.visible = true;
             speechBubbles.forEach( s => s.visible = false );
             if( isLongSpeechText ) {
               if( tpTrike.position.x < 500 ) {
