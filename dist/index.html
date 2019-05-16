@@ -348,7 +348,7 @@
         var current = enemies.map( e => ({ x: e.position.x, y: e.position.y, speed: e.moveSpeed }) );
         // Calculate a score for left, straight, right
         var currentScore = scoreWorld( tpImage.x, tpImage.y, current );
-        const timeStep = 100;
+        const timeStep = 50;
         var left = scoreAndSimTeapup( -30 * ( 2 * Math.PI / 360 ) * timeStep / 1000 * 4, current, timeStep );
         var right = scoreAndSimTeapup( 30 * ( 2 * Math.PI / 360 ) * timeStep / 1000 * 4, current, timeStep );
         var front = scoreAndSimTeapup( 0, current, timeStep );
@@ -373,7 +373,7 @@
         }
         tpTrike.angle = tpAngle;
         // console.log( tpTrike );
-        Matter.Body.setVelocity( tpTrike, { x: Math.cos( tpAngle ) * tpSpeed, y: Math.sin( tpAngle ) * tpSpeed } );
+        Unicorn.SetVelocity( "tricycle", Math.cos( tpAngle ) * tpSpeed, Math.sin( tpAngle ) * tpSpeed );
       }
 
       function shootSkittle() {
