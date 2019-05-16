@@ -48,7 +48,7 @@
         "Winner Winner Skittles Dinner",
         "Taste this rainbow cannon's fury!",
         "Eat colors and weep!",
-        "Enjoy my cavity canon!",
+        "Enjoy my cavity cannon!",
         "Do I still seem sweet to you?",
         "Someone call Dr. Bazooka Joe",
         "Trick or Treat!",
@@ -173,7 +173,7 @@
         tpImage.tint = 0xffffff;
       }
 
-      function showSpeechBubble( text ) {
+      function showSpeechBubble( text, showtime = 3000 ) {
         isSpeechBubbleShowing = true;
         isLongSpeechText = text.length > 20;
         if( text.length >= 35 ) {
@@ -183,7 +183,7 @@
           isSpeechBubbleShowing = false;
           speechBubbleText.visible = false;
           speechBubbles.forEach( x => x.visible = false );
-        }, 3000 );
+        }, showtime );
         speechBubbleText.text = text;
       }
 
@@ -191,6 +191,9 @@
         gameState = "battle";
         voteText.visible = false;
         speechBubbleText.visible = false;
+        setTimeout( () => {
+          showSpeechBubble( teapupQuotes[ getRandomInt( teapupQuotes.length ) ], 5000 );
+        }, 1000 );
       }
 
       function endGame() {
@@ -887,7 +890,7 @@
                 winTextTimer = 4000;
               }
               else if( winText - teapupWin.length < credits.length ) {
-                showSpeechBubble( credits[ winText - teapupWin.length ] );
+                showSpeechBubble( credits[ winText - teapupWin.length ], 2000 );
                 winTextTimer = 4000;
               }
               else {
